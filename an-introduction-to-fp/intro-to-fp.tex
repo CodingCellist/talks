@@ -125,6 +125,57 @@
 
 
 \section{Imperative vs Functional}
+  \subsection{Types}
+  \begin{frame}
+    \frametitle{Types}
+
+    \begin{itemize}
+      \item Types define sets of things
+      \begin{itemize}
+        \item `\texttt{int}' or `\texttt{Int}' denotes the set of integers
+        between $-(2^{31})$ and $2^{31} - 1$ (typically)
+        \item `\texttt{String}' denotes the infinite set of all possible strings
+      \end{itemize}
+      \item In Java, we have \texttt{int}, \texttt{bool}, \texttt{String}, etc.
+      \item In functional programming, we have these but we also have more
+      complicated types:
+      \begin{itemize}
+        \item `\texttt{Int -> Int}' --- the set of functions which take an
+        \texttt{Int} and return an \texttt{Int}
+        \item `\texttt{Type -> Type}' --- the set of functions which convert one
+        type to another (types are also first-class!)
+      \end{itemize}
+      \item We write ``\texttt{name : T}'' to say ``\texttt{name} has type
+      \texttt{T}''
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Types are useful!}
+
+    \begin{itemize}
+      \item Languages like Java, C++, Haskell, Idris, etc. are ``statically''
+      typed
+      \begin{itemize}
+        \item The compiler complains if we try to pass a `\texttt{String}' as an
+        argument to a function that expects an `\texttt{Int}'
+        \item Java and C++ automatically cast some numeric types
+      \end{itemize}
+      \item Languages like Python, Perl, PHP are ``dynamically'' typed
+      \begin{itemize}
+        \item Different things can be passed to functions regardless of their
+        type and errors arise at runtime rather than compile-time
+      \end{itemize}
+      \item In strongly typed languages, types help us use the functions,
+      data-structures, and variables we define correctly
+      \begin{itemize}
+        \item Like fitting the right shapes in the right holes
+      \end{itemize}
+    \end{itemize}
+
+  \end{frame}
+
   \subsection{Functions}
   \begin{frame}[fragile]
     \frametitle{Imperative programming}
@@ -171,10 +222,10 @@ power a p = a * power a (p - 1)
       \end{idrislisting}}
       \vspace*{-1mm}
       \item The `\texttt{export}' keyword allows for external access
-      \item The ``\texttt{power :}'' bit reads ``the function `\texttt{power}'
-            has type [...]''
-      \item ``\texttt{(a : Integer)}'' specifies an argument name and its type
+      \item The function `\texttt{power}' has type\\
+            `\texttt{Integer -> Integer -> Integer}'
       \item The `\texttt{->}' separates arguments
+      \item We can use `\texttt{(a : Integer)}' to give an argument a name
       \item The type after the final `\texttt{->}' is the function's return type
     \end{itemize}
 
@@ -210,58 +261,86 @@ power a p = a * power a (p - 1)
 
   \end{frame}
 
-  \subsection{Types}
-  \begin{frame}
-    \frametitle{Types}
-
-    \begin{itemize}
-      \item Types define sets of things
-        \begin{itemize}
-          \item `\texttt{int}' or `\texttt{Int}' denotes the set of integers
-                between $-(2^{31})$ and $2^{31} - 1$ (typically)
-          \item `\texttt{String}' denotes the infinite set of all possible strings
-        \end{itemize}
-      \item In Java, we have \texttt{int}, \texttt{bool}, \texttt{String}, etc.
-      \item In functional programming, we have these but we also have more
-            complicated types:
-        \begin{itemize}
-          \item `\texttt{Int -> Int}' --- the set of functions which take an
-                \texttt{Int} and return an \texttt{Int}
-          \item `\texttt{Type -> Type}' --- the set of functions which convert one
-                type to another (types are also first-class!)
-        \end{itemize}
-      \item We write ``\texttt{name : T}'' to say ``\texttt{name} has type
-            \texttt{T}''
-    \end{itemize}
-
-  \end{frame}
-
-  \begin{frame}
-    \frametitle{Types are useful!}
-
-    \begin{itemize}
-      \item Languages like Java, C++, Haskell, Idris, etc. are ``statically''
-            typed
-        \begin{itemize}
-          \item The compiler complains if we try to pass a `\texttt{String}' as an
-                argument to a function that expects an `\texttt{Int}'
-          \item Java and C++ automatically cast some numeric types
-        \end{itemize}
-      \item Languages like Python, Perl, PHP are ``dynamically'' typed
-        \begin{itemize}
-          \item Different things can be passed to functions regardless of their
-                type and errors arise at runtime rather than compile-time
-        \end{itemize}
-      \item In strongly typed languages, types help us use the functions,
-            data-structures, and variables we define correctly
-        \begin{itemize}
-          \item Like fitting the right shapes in the right holes
-        \end{itemize}
-    \end{itemize}
-
-  \end{frame}
-
   \subsection{Data structures}
+  \begin{frame}
+    \frametitle{Data declarations}
+
+    \begin{itemize}
+      \item In Java, we would likely create a class (or an enum)
+      \item In Idris, use the `\texttt{data}' or `\texttt{record}' keywords
+        \begin{itemize}
+          \item \texttt{record} is a data structure with implicit accessors
+        \end{itemize}
+      \item {\ttfamily
+             \underline{data} MyData : Type \underline{where}\\
+             \hspace*{1em} NoData : MyData\\
+             \hspace*{1em} IntData : (data : Int) -> MyData}
+        \begin{itemize}
+          \item Declares a new datatype `\texttt{MyData}'
+          \item With a constructor `\texttt{NoData}' that takes no arguments
+          \item And a constructor `\texttt{IntData}' that takes an argument
+                `\texttt{data}' of type \texttt{Int}
+        \end{itemize}
+      \item There is shorthand for this (with less control)
+        \begin{itemize}
+          \item {\ttfamily \underline{data} MyData = NoData | IntData Int}
+        \end{itemize}
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}[fragile]
+    \frametitle{Binary trees}
+
+    \begin{columns}
+      \column{0.55\textwidth}
+      Java:
+      {\scriptsize
+      \begin{lstlisting}[language=java]
+public class Tree<T> {
+  public static class Node<T> {
+    private T content;
+    private Node<T> left;
+    private Node<T> right;
+
+    public Node(T elem) {
+      this.elem = elem;
+      this.right = null;
+      this.left = null;
+    }
+  }
+  private Node<T> root;
+  ...
+}
+      \end{lstlisting}
+      }
+
+      \column{0.6\textwidth}
+      Idris:
+      %\vspace*{-6mm}
+
+      \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+data Tree : (t : Type) -> Type where
+  Empty : Tree t
+  Node  : (elem : t) ->
+          (left : BTree t) ->
+          (right : BTree t) ->
+          Tree t
+      \end{idrislisting}
+
+      \vspace*{1mm}
+
+      {\footnotesize Or, in shorthand form:}
+
+      \vspace*{-2mm}
+
+      \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+data Tree t
+  = Empty
+  | Node t (Tree t) (Tree t)
+      \end{idrislisting}
+    \end{columns}
+
+\end{frame}
 
 
 \section{Neat and convenient things}
