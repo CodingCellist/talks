@@ -316,7 +316,6 @@ public class Tree<T> {
 
       \column{0.6\textwidth}
       Idris:
-      %\vspace*{-6mm}
 
       \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
 data Tree : (t : Type) -> Type where
@@ -345,8 +344,126 @@ data Tree t
 
 \section{Neat and convenient things}
   \subsection{Pattern-matching}
+  \begin{frame}[fragile]
+    \frametitle{Pattern-matching}
 
-  \subsection{Higher order functions}
+    \begin{itemize}
+      \item We already saw this when defining the `\texttt{power}' function
+      \item Can match on \textit{any} data pattern
+      \item Pairwise addition:
+            \vspace*{-6mm}
+            \begin{idrislisting}
+addPair : (Int, Int) -> (Int, Int) -> (Int, Int)
+addPair (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
+            \end{idrislisting}
+      \vspace*{-2mm}
+      \item Discarding elements:
+            \vspace*{-6mm}
+            \begin{idrislisting}
+first : (a, b) -> a
+first (x, _) = x
+            \end{idrislisting}
+      \vspace*{-2mm}
+      \item Converting a tree to a list:
+            \vspace*{-6mm}
+            \begin{idrislisting}
+toList : Tree t -> List t
+toList Empty = []
+toList (Node elem left right) =
+  elem ++ toList left ++ toList right
+            \end{idrislisting}
+    \end{itemize}
+  \end{frame}
 
+  \subsection{Partial application}
+  \begin{frame}[fragile]
+    \frametitle{Partial application}
+
+    \begin{itemize}
+      \item Most imperative languages only allow you to call a function with all
+            its arguments
+      \item By contrast, most FP languages let you \textit{partially} apply a
+            function
+      \item Consider the `\texttt{power}' function from earlier
+        \begin{itemize}
+          \item We can perform the function call\\
+                \texttt{power 10}
+          \item The result of this has type `\texttt{Integer -> Integer}'
+          \item `\texttt{power 10}' returns a \textit{function} which takes an
+                integer and computes that power of 10
+        \end{itemize}
+      \item (This is actually how all functions work in FP, under the hood; it's
+            referred to as \textit{currying})
+        \begin{itemize}
+          \item `\texttt{2 + 4}' returns a function `\texttt{2 + x}' and applies
+                that to 4
+        \end{itemize}
+%      \item This is especially useful in combination with
+%            \textit{higher-order functions}
+    \end{itemize}
+  \end{frame}
+
+  \subsection{Higher-order functions}
+  \begin{frame}
+    \frametitle{Higher-order functions}
+
+    \begin{itemize}
+      \item A higher-order function is a function which takes a function as an
+            argument and/or returns a function
+      \item Partial application is a type of higher-order functions
+      \item The classic examples of higher-order functions are:
+        \begin{itemize}
+          \item \texttt{map : (f : a -> b) -> List a -> List b}\\
+                Apply the function `\texttt{f}' to every element of the
+                \texttt{List a}
+          \item \texttt{filter : (p : a -> Bool) -> List a -> List a}\\
+                Return the list of elements that satisfy the predicate
+                `\texttt{p}'
+        \end{itemize}
+      \item Since Java 8's `\texttt{Stream}', Java has HOFs
+      \item They're slowly creeping into more ``traditional'' languages
+    \end{itemize}
+  \end{frame}
+
+  \subsection{Lambda expressions}
+  \begin{frame}
+    \frametitle{Lambda expressions}
+
+    \begin{itemize}
+      \item Lambda expressions (or `lambdas', for short) are also known as
+            anonymous functions
+      \item Typically declared in-place, where they are needed
+      \item In Java:\\
+            {\footnotesize \texttt{(a, b) -> \{ return a + b; \}}}
+      \item In C++:\\
+            {\footnotesize \texttt{[](int a, int b) -> \{ return a + b; \}}}
+      \item In FP languages, declared using `\texttt{\textbackslash}':\\
+            {\footnotesize \texttt{\textbackslash a, b => a + b}}
+        \begin{itemize}
+          \item if you squint hard enough, \textbackslash\ looks a bit like
+                a $\lambda$
+        \end{itemize}
+    \end{itemize}
+  \end{frame}
+
+\section{Conclusion}
+  \subsection{Putting it all together}
+  % TODO: example with map or filter or foldr
+
+  \subsection{Why FP can be nice}
+  \begin{frame}
+    \frametitle{Why FP can be nice}
+
+    \begin{itemize}
+      \item When working on a problem, we often find ourselves operating on large
+            \textit{sets} of elements
+      \item Humans are good at defining \textit{what} to do with the elements
+            (how to solve the problem), computers are good at the \textit{how}
+        \begin{itemize}
+          \item How many for-loops have had an off-by-one error?
+        \end{itemize}
+      \item The next
+    \end{itemize}
+  \end{frame}
 
 \end{document}
