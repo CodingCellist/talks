@@ -39,10 +39,10 @@
             \end{itemize}
       \item ... me!
             \begin{itemize}
-              \item I'm Thomas
+              \item I'm Thomas/Tom
               \item I work with Edwin Brady
               \item I'm interested in formal methods, low-level programming,
-                    making software provably robust/correct, etc
+                    making software provably robust/correct, etc.
             \end{itemize}
     \end{itemize}
   \end{frame}
@@ -52,32 +52,41 @@
     \frametitle{What do we mean by `functional'?}
     \begin{itemize}
       \item As opposed to what? Non-functional?...
-      \item Using \textit{functions}
+      \item Ask 100 functional programmers, get at least 100 different answers
+      \item Functions should be \textit{first-class}
         \begin{itemize}
-          \item functions in the mathematical sense
-          \item map inputs to outputs
+          \item Can be assigned to variables, passed to other functions, stored
+                in data structures, etc., just like other first-class things,
+                e.g. numbers
+          \item Python and JavaScript allow this, but would not typically be
+                called `functional' languages
+        \end{itemize}
+      \item The language should encourage some ``functional programming style''
+        \begin{itemize}
+          \item More on this shortly
         \end{itemize}
     \end{itemize}
   \end{frame}
-  \begin{frame}
-    \frametitle{Imperative vs Functional}
-    \begin{itemize}
-      \item Imperative
-        \begin{itemize}
-          \item Define a lot of details on \textit{how} to do things
-          \item What to refer to memory as (e.g. variables and classes)
-          \item How to operate on the memory, how to update it, etc
-        \end{itemize}
-      \item Functional
-        \begin{itemize}
-          \item Define the details of \textit{what} to do
-          \item ``Given this input, the output looks like [...]''
-          \item The idea being that humans are better at reasoning about this
-          \item Leave the memory management and similar details to the programming
-                language implementation and runtime
-        \end{itemize}
-    \end{itemize}
-  \end{frame}
+%  \begin{frame}
+%    \frametitle{Imperative vs Functional}
+%    \begin{itemize}
+%      \item Imperative
+%        \begin{itemize}
+%          \item Define a lot of details on \textit{how} to do things
+%          \item What to refer to memory as (e.g. variables and classes)
+%          \item How to operate on the memory, how to update it, etc
+%        \end{itemize}
+%      \item Functional
+%        \begin{itemize}
+%          \item Define the details of \textit{what} to do
+%          \item ``Given this input, the output looks like [...]''
+%          \item The idea being that humans are better at reasoning about this
+%          \item Leave the memory management and similar details to the
+%programming
+%                language implementation and runtime
+%        \end{itemize}
+%    \end{itemize}
+%  \end{frame}
 
   \subsection{What FP doesn't have to be}
   \begin{frame}[fragile]
@@ -96,7 +105,7 @@
           };
         \end{tikzpicture}
 
-        \vspace*{6mm}
+        \vspace*{7mm}
 
         {\small ``A monad is just a monoid in the category of endofunctors,
         what's the problem?''}
@@ -115,52 +124,150 @@
   \end{frame}
 
 
-\section{Getting started}
-
-% TODO: there is an example here, but I need to fit it in
-\iffalse
-  \subsection{Example}
+\section{Imperative vs Functional}
+  \subsection{Functions}
   \begin{frame}[fragile]
     \frametitle{Imperative programming}
+
     \begin{itemize}
-      \item Summing the squares of numbers:
-            {\footnotesize
-            \begin{lstlisting}[language=java]
-public int sumSquares(int n) {
-  int sum = 0;
-  for (int i = 0; i <= n; i++) sum += i*i;
-  return sum;
+      \item Calculating the power of a number in Java:
+            \vspace*{-1mm}
+      {\footnotesize
+       \begin{lstlisting}[language=java]
+public int power(int a, int p) {
+  int pow = 1;
+  for (int i = 0; i < p; i++) {
+    pow = pow * a;
+  }
+  return pow;
 }
-            \end{lstlisting}
-            }
-      \item We have defined a lot of \textit{how}:
-            \begin{itemize}
-              \item create a variable \texttt{sum} with initial value 0
-              \item update the memory referred to as `\texttt{sum}' to be the
-                    contents of `\texttt{sum}', plus the contents `\texttt{i}'
-                    times itself
-              \item all the stuff about `\texttt{i}' in the `\texttt{for}' clause
-            \end{itemize}
+      \end{lstlisting}}
+      \vspace*{-2mm}
+      \item ``A \texttt{public} function, which returns an \texttt{int}, with name
+            `\texttt{power}', taking an \texttt{int} referred to as `\texttt{a}'
+            and an \texttt{int} referred to as `\texttt{p}' as arguments''
+      \item The body defines a lot of \textit{how}:
+        \begin{itemize}
+          \item Allocate an \texttt{int}-sized bit of memory referred to as
+                `\texttt{sum}', store the initial value 1 in it, how to update
+                it...
+        \end{itemize}
     \end{itemize}
 
   \end{frame}
 
   \begin{frame}[fragile]
     \frametitle{Functional programming}
-    \begin{itemize}
-      \item Summing squares in Idris:
-            {\footnotesize
-            \begin{idrislisting}
-sumSquares : Int -> Int
-sumSquares 0 = 0
-sumSquares n = n*n + sumSquares (n - 1)
-            \end{idrislisting}
-            }
-    \end{itemize}
-  \end{frame}
-\fi
 
-\section{Concepts}
-\subsection{Functions}
+    \begin{itemize}
+      \item In Idris:
+            \vspace*{-5mm}
+      {\footnotesize
+        \begin{idrislisting}
+export
+power : (a : Integer) -> (p : Integer) -> Integer
+power a 0 = 1
+power a p = a * power a (p - 1)
+      \end{idrislisting}}
+      \vspace*{-1mm}
+      \item The `\texttt{export}' keyword allows for external access
+      \item The ``\texttt{power :}'' bit reads ``the function `\texttt{power}'
+            has type [...]''
+      \item ``\texttt{(a : Integer)}'' specifies an argument name and its type
+      \item The `\texttt{->}' separates arguments
+      \item The type after the final `\texttt{->}' is the function's return type
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}[fragile]
+    \frametitle{Functional programming (cont.)}
+
+    \begin{itemize}
+      \item In Idris:
+      \vspace*{-5mm}
+      {\footnotesize
+        \begin{idrislisting}
+export
+power : (a : Integer) -> (p : Integer) -> Integer
+power a 0 = 1
+power a p = a * power a (p - 1)
+      \end{idrislisting}}
+      \vspace*{-1mm}
+      \item The function body here uses \textit{pattern-matching}
+        \begin{itemize}
+          \item Extremely useful!
+          \item Allows you to specify function return values in terms of the
+                `shape' of the input
+        \end{itemize}
+      \item If `\texttt{p}' is 0, then the answer is always 1
+      \item Otherwise, the answer is $a * a^{p-1}$
+        \begin{itemize}
+          \item In most FP languages, functions do not take parentheses around
+                their arguments (e.g. `\texttt{power 2 2}' would return 4)
+        \end{itemize}
+    \end{itemize}
+
+  \end{frame}
+
+  \subsection{Types}
+  \begin{frame}
+    \frametitle{Types}
+
+    \begin{itemize}
+      \item Types define sets of things
+        \begin{itemize}
+          \item `\texttt{int}' or `\texttt{Int}' denotes the set of integers
+                between $-(2^{31})$ and $2^{31} - 1$ (typically)
+          \item `\texttt{String}' denotes the infinite set of all possible strings
+        \end{itemize}
+      \item In Java, we have \texttt{int}, \texttt{bool}, \texttt{String}, etc.
+      \item In functional programming, we have these but we also have more
+            complicated types:
+        \begin{itemize}
+          \item `\texttt{Int -> Int}' --- the set of functions which take an
+                \texttt{Int} and return an \texttt{Int}
+          \item `\texttt{Type -> Type}' --- the set of functions which convert one
+                type to another (types are also first-class!)
+        \end{itemize}
+      \item We write ``\texttt{name : T}'' to say ``\texttt{name} has type
+            \texttt{T}''
+    \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Types are useful!}
+
+    \begin{itemize}
+      \item Languages like Java, C++, Haskell, Idris, etc. are ``statically''
+            typed
+        \begin{itemize}
+          \item The compiler complains if we try to pass a `\texttt{String}' as an
+                argument to a function that expects an `\texttt{Int}'
+          \item Java and C++ automatically cast some numeric types
+        \end{itemize}
+      \item Languages like Python, Perl, PHP are ``dynamically'' typed
+        \begin{itemize}
+          \item Different things can be passed to functions regardless of their
+                type and errors arise at runtime rather than compile-time
+        \end{itemize}
+      \item In strongly typed languages, types help us use the functions,
+            data-structures, and variables we define correctly
+        \begin{itemize}
+          \item Like fitting the right shapes in the right holes
+        \end{itemize}
+    \end{itemize}
+
+  \end{frame}
+
+  \subsection{Data structures}
+
+
+\section{Neat and convenient things}
+  \subsection{Pattern-matching}
+
+  \subsection{Higher order functions}
+
 
 \end{document}
