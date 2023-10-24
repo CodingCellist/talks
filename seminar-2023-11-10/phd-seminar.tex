@@ -1,0 +1,124 @@
+\documentclass[compress]{beamer}
+
+%%%%% PREAMBLE %%%%%
+
+\usepackage{todonotes}
+\setuptodonotes{inline}
+
+%\usetheme{Zurich}  % doesn't work for some reason
+%\usetheme{Flip}
+\usetheme{metropolis}
+
+\title{Superer awesome title goes here}
+\subtitle{Super awesome subtitle goes here}
+
+\author{Thomas Ekstr{\" o}m Hansen}
+\date{10\textsuperscript{th} November 2023}
+
+%\definecolor{staBlue}{HTML}{00539b}
+%\definecolor{staMidGreen}{HTML}{00853f}
+\definecolor{staDarkGreen}{HTML}{005953}
+\setbeamercolor{frametitle}{bg=staDarkGreen}
+
+
+%%%%% DOCUMENT %%%%%
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}
+  \frametitle{Introduction}
+
+  \begin{itemize}
+    \item We generally want software to be correct
+    \item Many approaches to this
+      \begin{itemize}
+        \item Test Driven Development
+        \item Mutation testing
+        \item Generative testing
+        \item Model Checking
+        \item Type theory
+        \item Mathematical abstractions and proofs
+      \end{itemize}
+    \item No one-size-fits-all
+      \begin{itemize}
+        \item So compromises are made
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{``Spectrum of Verification''}
+  \todo{Line with arrows detailing downsides?}
+  % probably cursed
+
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example}
+  \todo{Find one}
+  \todo{Different parts necessitate different amounts of verification}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Benefits of a multifaceted approach}
+
+  \begin{enumerate}
+    \item Adaptability \textemdash right tool for the job
+    \item Speed \textemdash can trade speed for level of verification
+    \item \textbf{Coherence} \textemdash all done in one system
+      \begin{itemize}
+        \item No need to translate to model-checking tool
+        \item Specification lives alongside model lives alongside
+              implementation
+        \item Parts can be verified independently \emph{while} combining into an
+              overall system
+      \end{itemize}
+  \end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{The eternal problem with verification systems}
+
+  \begin{itemize}
+    \item All verification systems face the same problem: ergonomics
+    \item If the system is not unobtrusive, people are unlikely to use it
+    \item Our hope is that this tries to not get in the way by being part of the
+          program
+      \begin{itemize}
+        \item Compiler and type-system assist you rather than hinder
+        \item Verify as you go along, tuning the strictness as necessary
+        \item Escape hatches provided for prototyping
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Conclusion}
+
+  \begin{itemize}
+    \item Many verification tools exist, none of them cover enough on their own
+    \item Instead of ``competing'', combine the systems to work together
+    \item Hopefully this will lead to wider adoption and better whole-system
+          soundness
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Questions}
+
+  \begin{center}
+    \begin{alertblock}{Questions?}
+    \end{alertblock}
+  \end{center}
+
+\end{frame}
+
+\end{document}
