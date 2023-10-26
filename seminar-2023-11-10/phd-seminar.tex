@@ -2,6 +2,9 @@
 
 %%%%% PREAMBLE %%%%%
 
+\usepackage{tikz}
+%\usepackage{enumitem}
+
 \usepackage{todonotes}
 \setuptodonotes{inline}
 
@@ -15,7 +18,7 @@
 \author{Thomas Ekstr{\" o}m Hansen}
 \date{10\textsuperscript{th} November 2023}
 
-%\definecolor{staBlue}{HTML}{00539b}
+\definecolor{staBlue}{HTML}{00539b}
 %\definecolor{staMidGreen}{HTML}{00853f}
 \definecolor{staDarkGreen}{HTML}{005953}
 \setbeamercolor{frametitle}{bg=staDarkGreen}
@@ -34,9 +37,9 @@
     \item We generally want software to be correct
     \item Many approaches to this
       \begin{itemize}
-        \item Test Driven Development
+        \item Test Driven Development (TDD)
         \item Mutation testing
-        \item Generative testing
+        \item Property-based testing
         \item Model Checking
         \item Type theory
         \item Mathematical abstractions and proofs
@@ -50,10 +53,129 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{``Spectrum of Verification''}
-  \todo{Line with arrows detailing downsides?}
-  % probably cursed
+  \frametitle{Spectrum of Verification}
+  %\todo{Line with arrows detailing downsides?}
 
+  % ~~probably~~ definitely cursed
+  \begin{tikzpicture}[> = stealth, semithick]
+    % scale %
+
+    % left half
+    \draw [dashed, <-] (-0.2, 0) -- (0.4, 0) ;
+    \draw (0.4, 0) -- (3.8, 0) ;
+
+    % middle dashed
+    \draw [dashed] (3.8, 0) -- (6.6, 0) ;
+
+    % right half
+    \draw (6.6, 0) -- (10, 0) ;
+    \draw [dashed, ->] (10, 0) -- (10.6, 0) ;
+
+
+    % ticks / vertical lines %
+
+    % leftmost tick (constructive proofs)
+    \draw (0.8, -0.5) -- (0.8, 0.5) ; %node [above right] {\small Formal proofs};
+    
+    % tick for model checking
+    \draw (3, -0.5) -- (3, 0.5) ;
+
+    % tick for Quickcheck
+    \draw (7.3, -0.5) -- (7.3, 0.5) ;
+
+    % rightmost tick (unit tests)
+    \draw (9.4, -0.5) -- (9.4, 0.5) ; %node [above left] {\small Unit tests};
+
+
+    % text boxes with arrows %
+
+    % constructive proofs
+    \node [draw, rounded corners,
+          text width=6em,
+          align=flush center,
+          color=staBlue]% 
+          at (1.5, 2.3)
+          (tbox-prf)
+          \bgroup
+          \tiny
+          Constructive proofs
+          \vspace*{-2pt}
+          % LaTeX looks beautiful and nice
+          % Also LaTeX:
+          \setlength{\leftmargini}{2em}
+          \begin{itemize}%[leftmargin=*]
+            \item CoQ, Agda, Isabelle \vspace*{-11pt}
+            \item Very strong guarantees \vspace*{-3pt}
+            \item Hard to write
+          \end{itemize}
+          \egroup
+          ;
+    \draw [thick, color=staBlue] (tbox-prf) -- (0.8, 0.5) ;
+
+    % model checking
+    \node [draw, rounded corners,
+          text width=6em,
+          align=flush center,
+          color=staBlue]% 
+          at (2.5, -2)
+          (tbox-mc)
+          \bgroup
+          \tiny
+          Model checking
+          \vspace*{-3pt}
+          \setlength{\leftmargini}{2em}
+          \begin{itemize}%[leftmargin=*]
+            \item \textsc{Spin, Uppaal}  \vspace*{-3pt}
+            \item Exhaustive search  \vspace*{-3pt}
+            \item Doesn't scale
+          \end{itemize}
+          \egroup
+          ;
+    \draw [thick, color=staBlue] (tbox-mc) -- (3, -0.5) ;
+
+    % property-based testing
+    \node [draw, rounded corners,
+          text width=8em,
+          align=flush center,
+          color=staBlue]% 
+          at (6, 2)
+          (tbox-qc)
+          \bgroup
+          \tiny
+          Property-based testing
+          \vspace*{-3pt}
+          \setlength{\leftmargini}{2em}
+          \begin{itemize}%[leftmargin=*]
+            \item QuickCheck, JQF \vspace*{-3pt}
+            \item Generates inputs for each property \vspace*{-3pt}
+            \item Might miss cases
+          \end{itemize}
+          \egroup
+          ;
+    \draw [thick, color=staBlue] (tbox-qc) -- (7.3, 0.5) ;
+
+    % tdd
+    \node [draw, rounded corners,
+          text width=8em,
+          align=flush center,
+          color=staBlue]% 
+          at (7.5, -2)
+          (tbox-tdd)
+          \bgroup
+          \tiny
+          Unit testing / TDD
+          \vspace*{-3pt}
+          \setlength{\leftmargini}{2em}
+          \begin{itemize}%[leftmargin=*]
+            \item JUnit, unittest, cfg(test) \vspace*{-3pt}
+            \item Easy to write \vspace*{-3pt}
+            \item Only tests what the programmer has thought of
+          \end{itemize}
+          \egroup
+          ;
+    \draw [thick, color=staBlue] (tbox-tdd) -- (9.4, -0.5) ;
+
+  \end{tikzpicture}
 
 \end{frame}
 
@@ -68,9 +190,9 @@
   \frametitle{Benefits of a multifaceted approach}
 
   \begin{enumerate}
-    \item Adaptability \textemdash right tool for the job
-    \item Speed \textemdash can trade speed for level of verification
-    \item \textbf{Coherence} \textemdash all done in one system
+    \item Adaptability {\textemdash} right tool for the job
+    \item Speed {\textemdash} can trade speed for level of verification
+    \item \textbf{Coherence} {\textemdash} all done in one system
       \begin{itemize}
         \item No need to translate to model-checking tool
         \item Specification lives alongside model lives alongside
@@ -95,6 +217,33 @@
         \item Verify as you go along, tuning the strictness as necessary
         \item Escape hatches provided for prototyping
       \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Using types only gets you part of the way there}
+  
+  \todo{ATM-dot, ISM, links between them}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example: ARQ {\textendash} overview}
+
+  \todo{Rework this slide}
+
+  \begin{itemize}
+    \item Automated Repeat reQuest {\textcolor{white}{(of course -\_-)}}
+    \item Sender sends one packet at a time
+    \item Wait for the receiver to acknowledge them
+    \item Resend if no ack is received within a given timeout
+  \end{itemize}
+
+  \begin{itemize}
+    \item Infinite states
+    \item Interface outwith our control
+    \item Other half possibly outwith our control
   \end{itemize}
 
 \end{frame}
