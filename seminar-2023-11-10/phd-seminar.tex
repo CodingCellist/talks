@@ -2,18 +2,23 @@
 
 %%%%% PREAMBLE %%%%%
 
+% we want to draw diagrams (turns out not like this though)
 \usepackage{tikz}
-%\usepackage{enumitem}
+% figures in a presentation look better without "Figure"
+\usepackage{caption}
+\captionsetup[figure]{labelformat=empty}
 
+%%%%% TODO: REMOVE ME!!! %%%%%
 \usepackage{todonotes}
-\setuptodonotes{inline}
+\setuptodonotes{inline} % for things to work nicely with beamer
+%%%%% TODO: REMOVE ME!!! %%%%%
 
 %\usetheme{Zurich}  % doesn't work for some reason
 %\usetheme{Flip}
 \usetheme{metropolis}
 
-\title{Superer awesome title goes here}
-\subtitle{Super awesome subtitle goes here}
+\title{Degrees of Software Correctness}
+\subtitle{Uniting the Spectrum of Verification}
 
 \author{Thomas Ekstr{\" o}m Hansen}
 \date{10\textsuperscript{th} November 2023}
@@ -180,6 +185,60 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{The eternal problem with verification systems}
+
+  \begin{itemize}
+    \item All verification systems face the same problem: ergonomics
+    \item If the system is not unobtrusive, people are unlikely to use it
+    \item Our hope is that our approach tries to not get in the way by being
+          part of the program
+      \begin{itemize}
+        \item Compiler and type-system assist you rather than hinder
+        \item Verify as you go along, tuning the strictness as necessary
+        \item Escape hatches provided for prototyping
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Using types only gets you part of the way there}
+  
+  \todo{ATM-dot, ISM, links between them}
+
+  \begin{center}
+  \begin{figure}
+    \begin{tikzpicture}[> = stealth, thick,
+                        roundnode/.style={circle, draw=black!100, minimum size=16mm},
+                        node distance=2cm and 3cm]
+      % ATM states %
+      \node [circle, draw=black!100, minimum size=14mm] {} ;
+      \node[roundnode] (st-ready) {Ready} ;
+      \node[roundnode] (st-card) [right=of st-ready, align=center] {\small Card\\\small inserted} ;
+      \node[roundnode] (st-session) [below=of st-ready] {Session} ;
+
+      % Arrows %
+      \draw [->] (st-ready.north east) -- (st-card.north west)
+            node [above, midway] {InsertCard} ;
+
+      \draw [->] (st-card.south west) -- (st-ready.south east)
+            node [below, midway] {Eject} ;
+      \draw [->] (st-card.south) -- (st-session.east)
+            node [right, midway] {PinOK} ;
+
+      \draw [->] (st-session.north) -- (st-ready.south)
+            node [left, midway] {Eject} ;
+
+      % TODO: Add the arrows going to the same states (arcs?)
+    \end{tikzpicture}
+
+    \caption{State machine of an ATM}
+  \end{figure}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
   \frametitle{Example}
   \todo{Find one}
   \todo{Different parts necessitate different amounts of verification}
@@ -201,30 +260,6 @@
               overall system
       \end{itemize}
   \end{enumerate}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{The eternal problem with verification systems}
-
-  \begin{itemize}
-    \item All verification systems face the same problem: ergonomics
-    \item If the system is not unobtrusive, people are unlikely to use it
-    \item Our hope is that this tries to not get in the way by being part of the
-          program
-      \begin{itemize}
-        \item Compiler and type-system assist you rather than hinder
-        \item Verify as you go along, tuning the strictness as necessary
-        \item Escape hatches provided for prototyping
-      \end{itemize}
-  \end{itemize}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{Using types only gets you part of the way there}
-  
-  \todo{ATM-dot, ISM, links between them}
 
 \end{frame}
 
