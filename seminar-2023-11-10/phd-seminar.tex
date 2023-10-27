@@ -4,9 +4,13 @@
 
 % we want to draw diagrams (turns out not like this though)
 \usepackage{tikz}
+
 % figures in a presentation look better without "Figure"
 \usepackage{caption}
 \captionsetup[figure]{labelformat=empty}
+
+% for Idris syntax highlighting
+\usepackage{idrislang}
 
 %%%%% TODO: REMOVE ME!!! %%%%%
 \usepackage{todonotes}
@@ -202,9 +206,9 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Using types only gets you part of the way there}
+  \frametitle{Visuals can really help}
   
-  \todo{ATM-dot, ISM, links between them}
+  %\todo{ATM-dot, ISM, links between them}
 
   \begin{center}
   \begin{figure}
@@ -224,18 +228,32 @@
       \draw [->] (st-card.south west) -- (st-ready.south east)
             node [below, midway] {Eject} ;
       \draw [->] (st-card.south) -- (st-session.east)
-            node [right, midway] {PinOK} ;
+            node [right, midway, xshift=1pt, yshift=-1mm] {\small CheckPIN?(Correct)} ;
 
       \draw [->] (st-session.north) -- (st-ready.south)
             node [left, midway] {Eject} ;
 
-      % TODO: Add the arrows going to the same states (arcs?)
+      % Lööps %
+      \draw [->] (st-card) to[loop above]
+            node [right, xshift=3mm, yshift=-5mm] {\footnotesize GetPIN!(PIN)}
+            () ;
+      \draw [->] (st-card) to[loop right]
+            node [below, xshift=3mm, yshift=-3mm] {\scriptsize CheckPIN?(Incorrect)}
+            () ;
+      \draw [->] (st-session) to[loop left]
+            node [below, xshift=2mm, yshift=-2mm] {\footnotesize Dispense} () ;
     \end{tikzpicture}
 
     \caption{State machine of an ATM}
   \end{figure}
   \end{center}
 
+\end{frame}
+
+\begin{frame}
+  \frametitle{Using types only gets you part of the way there}
+
+  % TODO: idris listing
 \end{frame}
 
 \begin{frame}
