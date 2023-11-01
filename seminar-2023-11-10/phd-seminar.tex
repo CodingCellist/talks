@@ -314,6 +314,23 @@ badProg =
 \end{frame}
 
 \begin{frame}
+  \frametitle{Disadvantages of \texttt{CMD}-like approach}
+
+  \begin{itemize}
+    \item Not the most ergonomic
+    \begin{itemize}
+      \item It is a Domain Specific Language
+      \item So it needs an interpreter; it is not directly runnable code
+      \item The type declarations can get lengthy
+    \end{itemize}
+    \item Composition is currently undefined
+    \begin{itemize}
+      \item We often want to compose code
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{Benefits of a multifaceted approach}
 
   \begin{enumerate}
@@ -324,6 +341,7 @@ badProg =
         \item No need to translate to model-checking tool
         \item Specification lives alongside model lives alongside
               implementation
+        \item The implementation is just there; it \emph{is} runnable code
         \item Parts can be verified independently \emph{while} combining into an
               overall system
       \end{itemize}
