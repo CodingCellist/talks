@@ -65,6 +65,7 @@
   \frametitle{Spectrum of Verification}
   %\todo{Line with arrows detailing downsides?}
 
+  \hspace*{-5mm}  % to fit the bounding box of the tikz diagram
   % ~~probably~~ definitely cursed
   \begin{tikzpicture}[> = stealth, semithick]
     % scale %
@@ -84,7 +85,7 @@
     % ticks / vertical lines %
 
     % leftmost tick (constructive proofs)
-    \draw (0.8, -0.5) -- (0.8, 0.5) ; %node [above right] {\small Formal proofs};
+    \draw (0.8, -0.5) -- (0.8, 0.5) ;
     
     % tick for model checking
     \draw (3, -0.5) -- (3, 0.5) ;
@@ -93,27 +94,34 @@
     \draw (7.3, -0.5) -- (7.3, 0.5) ;
 
     % rightmost tick (unit tests)
-    \draw (9.4, -0.5) -- (9.4, 0.5) ; %node [above left] {\small Unit tests};
+    \draw (9.4, -0.5) -- (9.4, 0.5) ;
+
+
+    % scale labels %
+
+    \node at (0, -0.3) {\scriptsize Stronger} ;
+    \node at (10.3, -0.3) {\scriptsize Weaker} ;
 
 
     % text boxes with arrows %
 
     % constructive proofs
     \node [draw, rounded corners,
-          text width=6em,
+          text width=7em,
           align=flush center,
           color=staBlue]% 
           at (1.5, 2.3)
           (tbox-prf)
           \bgroup
-          \tiny
+          \scriptsize
           Constructive proofs
           \vspace*{-2pt}
+          \tiny
           % LaTeX looks beautiful and nice
           % Also LaTeX:
           \setlength{\leftmargini}{2em}
           \begin{itemize}%[leftmargin=*]
-            \item CoQ, Agda, Isabelle \vspace*{-11pt}
+            \item CoQ, Agda, Isabelle \vspace*{-3pt}
             \item Very strong guarantees \vspace*{-3pt}
             \item Hard to write
           \end{itemize}
@@ -129,9 +137,10 @@
           at (2.5, -2)
           (tbox-mc)
           \bgroup
-          \tiny
+          \scriptsize
           Model checking
           \vspace*{-3pt}
+          \tiny
           \setlength{\leftmargini}{2em}
           \begin{itemize}%[leftmargin=*]
             \item \textsc{Spin, Uppaal}  \vspace*{-3pt}
@@ -150,9 +159,10 @@
           at (6, 2)
           (tbox-qc)
           \bgroup
-          \tiny
+          \scriptsize
           Property-based testing
           \vspace*{-3pt}
+          \tiny
           \setlength{\leftmargini}{2em}
           \begin{itemize}%[leftmargin=*]
             \item QuickCheck, JQF \vspace*{-3pt}
@@ -171,9 +181,10 @@
           at (7.5, -2)
           (tbox-tdd)
           \bgroup
-          \tiny
+          \scriptsize
           Unit testing / TDD
           \vspace*{-3pt}
+          \tiny
           \setlength{\leftmargini}{2em}
           \begin{itemize}%[leftmargin=*]
             \item JUnit, unittest, cfg(test) \vspace*{-3pt}
@@ -256,6 +267,11 @@
   % TODO: try to get this nicer via Katla?
   \vspace*{-3mm}
   \idrisinput{ATM.idr}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Using types only gets you part of the way there}
+  \todo{example programs}
 \end{frame}
 
 \begin{frame}
