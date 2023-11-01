@@ -395,15 +395,39 @@ badProg =
 \end{frame}
 
 \begin{frame}
-  \frametitle{Example: ARQ {\textendash} Challenges}
-    \todo{Different parts necessitate different amounts of verification}
+  \frametitle{Example: ARQ {\textendash} Verification challenges}
+
+    \textbf{Different parts necessitate different amounts of verification}
 
     \begin{itemize}
-      \item Potentially infinite states (packet numbering)
-      \item Interface outwith our control
-      \item Other half possibly outwith our control
+      \item Data verification is relatively simple 
+        \begin{itemize}
+          \item Proofs might be feasible.
+        \end{itemize}
+      \item Potentially infinite packet numbers
+        \begin{itemize}
+          \item Proofs will be tedious
+          \item Not fit for model checking
+        \end{itemize}
+      \item Network interface possibly outwith our control
+        \begin{itemize}
+          \item Likely using a library or similar
+          \item Cannot control how interfaces behave
+        \end{itemize}
+      \item Other half likely not even physically local
+        \begin{itemize}
+          \item Interfacing with someone else's code and/or infrastructure
+          \item Impossible to reason about beyond handling responses
+        \end{itemize}
     \end{itemize}
 
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example: ARQ {\textendash} Our approach}
+
+  \todo{CODE (or at least a sketch)}
+  \todo{Another slide relating code to why our approach is wonderful?}
 \end{frame}
 
 \begin{frame}
