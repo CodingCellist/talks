@@ -355,19 +355,37 @@ badProg =
   \todo{Rework this slide; protocol diagram?}
   \todo{Different parts necessitate different amounts of verification}
 
-  \begin{itemize}
-    \item Automated Repeat reQuest {\textcolor{white}{(of course -\_-)}}
-    \item Sender sends one packet at a time
-    \item Wait for the receiver to acknowledge them
-    \item Resend if no ack is received within a given timeout
-  \end{itemize}
+  \begin{columns}
+  \begin{column}{0.7\framewidth}
+    \begin{itemize}
+      \item Automated Repeat reQuest {\textcolor{white}{(of course -\_-)}}
+      \item Sender sends one packet at a time
+      \item Wait for the receiver to acknowledge them
+      \item Resend if no ack is received within a given timeout
+    \end{itemize}
 
-  \begin{itemize}
-    \item Infinite states
-    \item Interface outwith our control
-    \item Other half possibly outwith our control
-  \end{itemize}
+    \begin{itemize}
+      \item Infinite states
+      \item Interface outwith our control
+      \item Other half possibly outwith our control
+    \end{itemize}
+  \end{column}
 
+  \begin{column}{0.3\framewidth}
+    % TODO: figure out how to center the caption?
+    \begin{figure}
+      \begin{tikzpicture}[> = stealth, thick]
+        \draw [->] (-1, 2) node [above] {\tiny Sender} -- (-1, -2) ;
+
+        \draw [->] (1, 2) node [above] {\tiny Receiver} -- (1, -2) ;
+
+      \end{tikzpicture}
+
+      \caption{Sample ARQ transmission}
+    \end{figure}
+  \end{column}
+
+  \end{columns}
 \end{frame}
 
 \begin{frame}
