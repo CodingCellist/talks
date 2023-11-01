@@ -28,7 +28,7 @@
 \date{10\textsuperscript{th} November 2023}
 
 \definecolor{staBlue}{HTML}{00539b}
-%\definecolor{staMidGreen}{HTML}{00853f}
+\definecolor{staMidGreen}{HTML}{00853f}
 \definecolor{staDarkGreen}{HTML}{005953}
 \setbeamercolor{frametitle}{bg=staDarkGreen}
 
@@ -269,9 +269,48 @@
   \idrisinput{ATM.idr}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]  % <--- N.B. `fragile` required for listing to work
   \frametitle{Using types only gets you part of the way there}
-  \todo{example programs}
+  %\todo{example programs}
+
+  \begin{columns}
+  \begin{column}{0.47\framewidth}
+    {\color{staMidGreen} Accepted by the compiler:}
+    %\vspace*{-5mm}
+    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+atmProg : CMD ()
+            Ready (const Ready)
+atmProg =
+  do InsertCard
+     pin <- GetPIN
+     Correct <- CheckPIN pin
+       | Incorrect => EjectCard
+     amt <- GetAmount
+     Dispense amt 
+     EjectCard
+    \end{idrislisting}
+  \end{column}
+
+  \hspace*{-1.5mm}
+  \vrule{}
+
+  \begin{column}{0.53\framewidth}
+    {\color{red} Rejected by the compiler:}
+    %\vspace*{-3mm}
+    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+badProg : CMD ()
+            Ready (const Ready)
+badProg =
+  do InsertCard
+     pin <- GetPIN
+     Correct <- CheckPIN pin
+       | Incorrect => InsertCard
+     amt <- GetAmount
+     Dispense amt 
+     -- forgot to eject
+    \end{idrislisting}
+  \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
