@@ -43,19 +43,19 @@
   \frametitle{Introduction}
 
   \begin{itemize}
-    \item We generally want software to be correct
-    \item Many approaches to this
+    \item<1-> We generally want software to be correct
+    \item<1-> Many approaches to this
       \begin{itemize}
-        \item Test Driven Development (TDD)
-        \item Mutation testing
-        \item Property-based testing
-        \item Model Checking
-        \item Type theory
-        \item Mathematical abstractions and proofs
+        \item<2-> Test Driven Development (TDD)
+        \item<3-> Mutation testing
+        \item<4-> Property-based testing
+        \item<5-> Model Checking
+        \item<6-> Type theory
+        \item<7-> Mathematical abstractions and proofs
       \end{itemize}
-    \item No one-size-fits-all
+    \item<8-> No one-size-fits-all
       \begin{itemize}
-        \item So compromises are made
+        \item<9-> So compromises are made
       \end{itemize}
   \end{itemize}
 
@@ -63,7 +63,7 @@
 
 \begin{frame}
   \frametitle{Spectrum of Verification}
-  %\todo{Line with arrows detailing downsides?}
+  \todo{Overlay specifications}
 
   \hspace*{-5mm}  % to fit the bounding box of the tikz diagram
   % ~~probably~~ definitely cursed
@@ -203,14 +203,14 @@
   \frametitle{The eternal problem with verification systems}
 
   \begin{itemize}
-    \item All verification systems face the same problem: ergonomics
-    \item If the system is not unobtrusive, people are unlikely to use it
-    \item Our hope is that our approach tries to not get in the way by being
+    \item<1-> All verification systems face the same problem: ergonomics
+    \item<2-> If the system is not unobtrusive, people are unlikely to use it
+    \item<3-> Our hope is that our approach tries to not get in the way by being
           part of the program
       \begin{itemize}
-        \item Compiler and type-system assist you rather than hinder
-        \item Verify as you go along, tuning the strictness as necessary
-        \item Escape hatches provided for prototyping
+        \item<4-> Compiler and type-system assist you rather than hinder
+        \item<5-> Verify as you go along, tuning the strictness as necessary
+        \item<6-> Escape hatches provided for prototyping
       \end{itemize}
   \end{itemize}
 
@@ -291,6 +291,8 @@ atmProg =
     \end{idrislisting}
   \end{column}
 
+  \pause  % first show the good, then the bad code
+
   \hspace*{-1.5mm}
   \vrule{}
 
@@ -319,13 +321,13 @@ badProg =
   \begin{itemize}
     \item Not the most ergonomic
     \begin{itemize}
-      \item It is a Domain Specific Language
-      \item So it needs an interpreter; it is not directly runnable code
-      \item The type declarations can get lengthy
+      \item<2-> It is a Domain Specific Language
+      \item<3-> So it needs an interpreter; it is not directly runnable code
+      \item<4-> The type declarations can get lengthy
     \end{itemize}
-    \item Composition is currently undefined
+    \item<5-> Composition is currently undefined
     \begin{itemize}
-      \item We often want to compose code
+      \item<6-> We often want to compose code
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -335,14 +337,14 @@ badProg =
 
   \begin{enumerate}
     \item Adaptability {\textemdash} right tool for the job
-    \item Speed {\textemdash} can trade speed for level of verification
-    \item \textbf{Coherence} {\textemdash} all done in one system
+    \item<2-> Speed {\textemdash} can trade speed for level of verification
+    \item<3-> \textbf{Coherence} {\textemdash} all done in one system
       \begin{itemize}
-        \item No need to translate to model-checking tool
-        \item Specification lives alongside model lives alongside
+        \item<4-> No need to translate to model-checking tool
+        \item<5-> Specification lives alongside model lives alongside
               implementation
-        \item The implementation is just there; it \emph{is} runnable code
-        \item Parts can be verified independently \emph{while} combining into an
+        \item<6-> The implementation is just there; it \emph{is} runnable code
+        \item<7-> Parts can be verified independently \emph{while} combining into an
               overall system
       \end{itemize}
   \end{enumerate}
@@ -356,15 +358,16 @@ badProg =
 
   \begin{column}{0.7\framewidth}
     \begin{itemize}
-      \item Automated Repeat reQuest {\textcolor{white}{(of course -\_-)}}
-      \item Sender sends one packet at a time
-      \item Wait for the receiver to acknowledge they are ready for the next
+      \item<2-> Automated Repeat reQuest {\textcolor{white}{(of course -\_-)}}
+      \item<3-> Sender sends one packet at a time
+      \item<4-> Wait for the receiver to acknowledge they are ready for the next
             packet
-      \item Resend if no acknowledgement is received within a given timeout
+      \item<5-> Resend if no acknowledgement is received within a given timeout
     \end{itemize}
   \end{column}
 
-  \begin{column}{0.3\framewidth}
+  \begin{column}{0.3\framewidth}<6->
+    \todo{Overlay annotations?}
     \begin{figure}
       \begin{tikzpicture}[> = stealth, thick]
         \draw [->] (-1, 2) node [above] {\tiny Sender} -- (-1, -2) ;
@@ -400,24 +403,24 @@ badProg =
     \textbf{Different parts necessitate different amounts of verification}
 
     \begin{itemize}
-      \item Data verification is relatively simple 
+      \item<1-> Data verification is relatively simple 
         \begin{itemize}
-          \item Proofs might be feasible.
+          \item<1-> Proofs might be feasible.
         \end{itemize}
-      \item Potentially infinite packet numbers
+      \item<2-> Potentially infinite packet numbers
         \begin{itemize}
-          \item Proofs will be tedious
-          \item Not fit for model checking
+          \item<3-> Proofs will be tedious
+          \item<4-> Not fit for model checking
         \end{itemize}
-      \item Network interface possibly outwith our control
+      \item<5-> Network interface possibly outwith our control
         \begin{itemize}
-          \item Likely using a library or similar
-          \item Cannot control how interfaces behave
+          \item<6-> Likely using a library or similar
+          \item<7-> Cannot control how interfaces behave
         \end{itemize}
-      \item Other half likely not even physically local
+      \item<8-> Other half likely not even physically local
         \begin{itemize}
-          \item Interfacing with someone else's code and/or infrastructure
-          \item Impossible to reason about beyond handling responses
+          \item<9-> Interfacing with someone else's code and/or infrastructure
+          \item<10-> Impossible to reason about beyond handling responses
         \end{itemize}
     \end{itemize}
 
@@ -435,8 +438,8 @@ badProg =
 
   \begin{itemize}
     \item Many verification tools exist, none of them cover enough on their own
-    \item Instead of ``competing'', combine the systems to work together
-    \item Hopefully this will lead to wider adoption and better whole-system
+    \item<2-> Instead of ``competing'', combine the systems to work together
+    \item<3-> Hopefully this will lead to wider adoption and better whole-system
           soundness
   \end{itemize}
 
