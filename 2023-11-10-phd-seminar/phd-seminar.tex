@@ -13,6 +13,13 @@
 % for Idris syntax highlighting
 \usepackage{idrislang}
 
+% slide url at the end
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  urlcolor=purple
+}
+
 % N.B. For some reason, things don't build without this...
 \usepackage{todonotes}
 \setuptodonotes{inline} % for things to work nicely with beamer
@@ -505,7 +512,19 @@ badProg =
   \frametitle{Questions}
 
   \begin{center}
-    \textcolor{orange}{\Large Questions?}
+    \textcolor<1>{orange}{\Large Questions?}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Slides}
+
+  \begin{center}
+    \begin{figure}
+      \includegraphics[width=0.35\framewidth]{qr-code.png}
+      \caption{\href{https://github.com/CodingCellist/talks/blob/main/2023-11-10-phd-seminar}{github.com/CodingCellist/talks}}
+    \end{figure}
   \end{center}
 
 \end{frame}
