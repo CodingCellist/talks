@@ -432,8 +432,44 @@ badProg =
 \begin{frame}
   \frametitle{Example: ARQ {\textendash} Our approach}
 
-  \todo{CODE (or at least a sketch)}
-  \todo{Another slide relating code to why our approach is wonderful?}
+  \begin{itemize}
+    \item<1-> Compression can be proven to be correctly implemented
+      \begin{itemize}
+        \item<2-> Types for compressed and uncompressed data
+        \item<3-> Link the two via \texttt{\textasciigrave compress\textasciigrave} and
+                  \texttt{\textasciigrave uncompress\textasciigrave} functions
+        \item<4-> Now the compiler can help us implement them and check that we
+                  have done so correctly
+      \end{itemize}
+    \item<5-> QuickCheck can simulate network behaviour
+      \begin{itemize}
+        \item<6-> Begin at an arbitrary point
+        \item<7-> Simulate chance of failure
+        \item<8-> Potentially with arbitrary parameters for each run
+      \end{itemize}
+    \item<9-> Some boolean tests could be added for the network implementation
+      \begin{itemize}
+        \item<10-> The simulated behaviour is well-behaved\dots
+        \item<11-> {\dots} is the actual behaviour?
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example: ARQ {\textendash} Benefits of our approach}
+
+  \begin{itemize}
+    \item<1-> All in the same system
+    \item<2-> We do not need to trust we have modelled the problem correctly, we
+              can test that!
+    \item<3-> Can use as strong or weak verification as we want
+    \item<4-> The datatypes used when verifying are the same ones used for the
+              implementation
+    \item<5-> The compiled program is an executable version of our verified
+              implementation!
+  \end{itemize}
+
 \end{frame}
 
 \begin{frame}
@@ -441,9 +477,9 @@ badProg =
 
   \begin{itemize}
     \item Many verification tools exist, none of them cover enough on their own
-    \item<2-> Instead of ``competing'', combine the systems to work together
+    \item<2-> Instead of ``competing'', we combine the systems to work together
     \item<3-> Hopefully this will lead to wider adoption and better whole-system
-          soundness
+              soundness
   \end{itemize}
 
 \end{frame}
