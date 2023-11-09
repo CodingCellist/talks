@@ -13,10 +13,9 @@
 % for Idris syntax highlighting
 \usepackage{idrislang}
 
-%%%%% TODO: REMOVE ME!!! %%%%%
+% N.B. For some reason, things don't build without this...
 \usepackage{todonotes}
 \setuptodonotes{inline} % for things to work nicely with beamer
-%%%%% TODO: REMOVE ME!!! %%%%%
 
 %\usetheme{Zurich}  % doesn't work for some reason
 %\usetheme{Flip}
@@ -62,7 +61,7 @@
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Spectrum of Verification}
 
   \hspace*{-5mm}  % to fit the bounding box of the tikz diagram
@@ -223,8 +222,6 @@
 \begin{frame}
   \frametitle{Visuals can really help}
   
-  %\todo{ATM-dot, ISM, links between them}
-
   \begin{center}
   \begin{figure}
     \begin{tikzpicture}[> = stealth, thick,
@@ -275,7 +272,6 @@
 
 \begin{frame}[fragile]  % <--- N.B. `fragile` required for listing to work
   \frametitle{Using types only gets you part of the way there}
-  %\todo{example programs}
 
   \begin{columns}
   \begin{column}{0.47\framewidth}
@@ -320,7 +316,7 @@ badProg =
 \end{frame}
 
 \begin{frame}
-  \frametitle{Disadvantages of \texttt{CMD}-like approach}
+  \frametitle{Disadvantages of the \texttt{CMD}-like approach}
 
   \begin{itemize}
     \item Not the most ergonomic
@@ -331,7 +327,8 @@ badProg =
     \end{itemize}
     \item<5-> Composition is currently undefined
     \begin{itemize}
-      \item<6-> We often want to compose code
+      \item<6-> The theory it builds on does not currently support composition
+      \item<7-> But we often want to compose code and functionality
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -438,19 +435,21 @@ badProg =
         \item<2-> Types for compressed and uncompressed data
         \item<3-> Link the two via \texttt{\textasciigrave compress\textasciigrave} and
                   \texttt{\textasciigrave uncompress\textasciigrave} functions
-        \item<4-> Now the compiler can help us implement them and check that we
-                  have done so correctly
+        \item<4-> The compiler can then help us implement those correctly
       \end{itemize}
     \item<5-> QuickCheck can simulate network behaviour
       \begin{itemize}
-        \item<6-> Begin at an arbitrary point
-        \item<7-> Simulate chance of failure
-        \item<8-> Potentially with arbitrary parameters for each run
+        \item<6-> Generate an arbitrary packet
+        \item<7-> Simulate sending with a chance of failure
+        \item<8-> Check that 10 or 100 different sequences all get delivered
+        \item<9-> All done at compile-time, using the same datatypes as the
+                  implementation
       \end{itemize}
-    \item<9-> Some boolean tests could be added for the network implementation
+    \item<10-> Some unit tests could be added for the network implementation
       \begin{itemize}
-        \item<10-> The simulated behaviour is well-behaved\dots
-        \item<11-> {\dots} is the actual behaviour?
+        \item<11-> Interaction with external libraries, so unit tests is best we
+                   can do
+        \item<12-> Confidence from QuickCheck increased by these passing
       \end{itemize}
   \end{itemize}
 
@@ -463,9 +462,9 @@ badProg =
     \item<1-> All in the same system
     \item<2-> We do not need to trust we have modelled the problem correctly, we
               can test that!
-    \item<3-> Can use as strong or weak verification as we want
-    \item<4-> The datatypes used when verifying are the same ones used for the
-              implementation
+    \item<3-> Can use as stronger or weaker verification as wanted/required
+    \item<4-> There is a link between the verified and implemented model: the
+              datatypes!
     \item<5-> The compiled program is an executable version of our verified
               implementation!
   \end{itemize}
