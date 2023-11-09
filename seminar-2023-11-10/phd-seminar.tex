@@ -64,7 +64,6 @@
 
 \begin{frame}
   \frametitle{Spectrum of Verification}
-  \todo{Overlay specifications}
 
   \hspace*{-5mm}  % to fit the bounding box of the tikz diagram
   % ~~probably~~ definitely cursed
@@ -86,16 +85,16 @@
     % ticks / vertical lines %
 
     % leftmost tick (constructive proofs)
-    \draw (0.8, -0.5) -- (0.8, 0.5) ;
+    \draw<2-> (0.8, -0.5) -- (0.8, 0.5) ;
     
     % tick for model checking
-    \draw (3, -0.5) -- (3, 0.5) ;
+    \draw<3-> (3, -0.5) -- (3, 0.5) ;
 
     % tick for Quickcheck
-    \draw (7.3, -0.5) -- (7.3, 0.5) ;
+    \draw<4-> (7.3, -0.5) -- (7.3, 0.5) ;
 
     % rightmost tick (unit tests)
-    \draw (9.4, -0.5) -- (9.4, 0.5) ;
+    \draw<5-> (9.4, -0.5) -- (9.4, 0.5) ;
 
 
     % scale labels %
@@ -107,7 +106,8 @@
     % text boxes with arrows %
 
     % constructive proofs
-    \node [draw, rounded corners,
+    \node<2->
+          [draw, rounded corners,
           text width=7em,
           align=flush center,
           color=staBlue]% 
@@ -128,10 +128,11 @@
           \end{itemize}
           \egroup
           ;
-    \draw [thick, color=staBlue] (tbox-prf) -- (0.8, 0.5) ;
+    \draw<2-> [thick, color=staBlue] (tbox-prf) -- (0.8, 0.5) ;
 
     % model checking
-    \node [draw, rounded corners,
+    \node<3->
+          [draw, rounded corners,
           text width=6em,
           align=flush center,
           color=staBlue]% 
@@ -150,10 +151,11 @@
           \end{itemize}
           \egroup
           ;
-    \draw [thick, color=staBlue] (tbox-mc) -- (3, -0.5) ;
+    \draw<3-> [thick, color=staBlue] (tbox-mc) -- (3, -0.5) ;
 
     % property-based testing
-    \node [draw, rounded corners,
+    \node<4->
+          [draw, rounded corners,
           text width=8em,
           align=flush center,
           color=staBlue]% 
@@ -172,10 +174,11 @@
           \end{itemize}
           \egroup
           ;
-    \draw [thick, color=staBlue] (tbox-qc) -- (7.3, 0.5) ;
+    \draw<4-> [thick, color=staBlue] (tbox-qc) -- (7.3, 0.5) ;
 
     % tdd
-    \node [draw, rounded corners,
+    \node<5->
+          [draw, rounded corners,
           text width=8em,
           align=flush center,
           color=staBlue]% 
@@ -194,7 +197,7 @@
           \end{itemize}
           \egroup
           ;
-    \draw [thick, color=staBlue] (tbox-tdd) -- (9.4, -0.5) ;
+    \draw<5-> [thick, color=staBlue] (tbox-tdd) -- (9.4, -0.5) ;
 
   \end{tikzpicture}
 
@@ -363,12 +366,11 @@ badProg =
       \item<3-> Sender sends one packet at a time
       \item<4-> Wait for the receiver to acknowledge they are ready for the next
             packet
-      \item<5-> Resend if no acknowledgement is received within a given timeout
+      \item<6-> Resend if no acknowledgement is received within a given timeout
     \end{itemize}
   \end{column}
 
-  \begin{column}{0.3\framewidth}<6->
-    \todo{Overlay annotations?}
+  \begin{column}{0.3\framewidth}<2->
     \begin{figure}
       \begin{tikzpicture}[> = stealth, thick]
         \draw [->] (-1, 2) node [above] {\tiny Sender} -- (-1, -2) ;
@@ -376,17 +378,17 @@ badProg =
         \draw [->] (1, 2) node [above] {\tiny Receiver} -- (1, -2) ;
 
         % send N
-        \draw [->] (-1, 1.7) node [right, xshift=5mm] {\tiny SEND 4} -- (1, 1.4) ;
+        \draw<3-> [->] (-1, 1.7) node [right, xshift=5mm] {\tiny SEND 4} -- (1, 1.4) ;
         % ack N+1
-        \draw [->] (1, 1.2) node [left, xshift=-5mm] {\tiny ACK 5} -- (-1, 0.9) ;
+        \draw<4-> [->] (1, 1.2) node [left, xshift=-5mm] {\tiny ACK 5} -- (-1, 0.9) ;
         % send N+1
-        \draw [->] (-1, 0.5) node [right, xshift=5mm] {\tiny SEND 5} -- (1, 0.3) ;
+        \draw<5-> [->] (-1, 0.5) node [right, xshift=5mm] {\tiny SEND 5} -- (1, 0.3) ;
         % timeout
-        \node at (-0.4, -0.2) {\tiny TIMEOUT} ;
+        \node<6-> at (-0.4, -0.2) {\tiny TIMEOUT} ;
         % resend N+1
-        \draw [->] (-1, -0.7) node [right, xshift=5mm] {\tiny SEND 5} -- (1, -1.0) ;
+        \draw<7-> [->] (-1, -0.7) node [right, xshift=5mm] {\tiny SEND 5} -- (1, -1.0) ;
         % ack N+2
-        \draw [->] (1, -1.2) node [left, xshift=-5mm] {\tiny ACK 6} -- (-1, -1.5) ;
+        \draw<8-> [->] (1, -1.2) node [left, xshift=-5mm] {\tiny ACK 6} -- (-1, -1.5) ;
         % etc...
       \end{tikzpicture}
 
