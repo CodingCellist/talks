@@ -39,6 +39,7 @@
 
 \maketitle
 
+
 \begin{frame}
   \frametitle{Introduction}
 
@@ -60,6 +61,7 @@
   \end{itemize}
 
 \end{frame}
+
 
 \begin{frame}[fragile]
   \frametitle{Spectrum of Verification}
@@ -202,6 +204,7 @@
 
 \end{frame}
 
+
 \begin{frame}
   \frametitle{The eternal problem with verification systems}
 
@@ -209,7 +212,7 @@
     \item<1-> All verification systems face the same problem: ergonomics
     \item<2-> If the system is not unobtrusive, people are unlikely to use it
     \item<3-> Our hope is that our approach tries to not get in the way by being
-          part of the program
+              part of the program
       \begin{itemize}
         \item<4-> Compiler and type-system assist you rather than hinder
         \item<5-> Verify as you go along, tuning the strictness as necessary
@@ -218,6 +221,7 @@
   \end{itemize}
 
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Visuals can really help}
@@ -262,6 +266,7 @@
 
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Using types only gets you part of the way there}
 
@@ -269,6 +274,7 @@
   \vspace*{-3mm}
   \idrisinput{ATM.idr}
 \end{frame}
+
 
 \begin{frame}[fragile]  % <--- N.B. `fragile` required for listing to work
   \frametitle{Using types only gets you part of the way there}
@@ -315,11 +321,12 @@ badProg =
   \end{columns}
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Disadvantages of the \texttt{CMD}-like approach}
 
   \begin{itemize}
-    \item Not the most ergonomic
+    \item<1-> Not the most ergonomic
     \begin{itemize}
       \item<2-> It is a Domain Specific Language
       \item<3-> So it needs an interpreter; it is not directly runnable code
@@ -333,27 +340,32 @@ badProg =
   \end{itemize}
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Benefits of a multifaceted approach}
 
   \begin{enumerate}
-    \item Adaptability {\textemdash} right tool for the job
+    \item<1-> Adaptability {\textemdash} right tool for the job
     \item<2-> Speed {\textemdash} can trade speed for level of verification
     \item<3-> \textbf{Coherence} {\textemdash} all done in one system
       \begin{itemize}
         \item<4-> No need to translate to model-checking tool
         \item<5-> Specification lives alongside model lives alongside
-              implementation
+                  implementation
         \item<6-> The implementation is just there; it \emph{is} runnable code
         \item<7-> Parts can be verified independently \emph{while} combining into an
-              overall system
+                  overall system
       \end{itemize}
   \end{enumerate}
 
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Example: ARQ {\textendash} Overview}
+
+  % deliberately starting at <2-> to be able to introduce the example from the
+  % title alone
 
   \begin{columns}
 
@@ -362,7 +374,7 @@ badProg =
       \item<2-> Automated Repeat reQuest {\textcolor{white}{(of course -\_-)}}
       \item<3-> Sender sends one packet at a time
       \item<4-> Wait for the receiver to acknowledge they are ready for the next
-            packet
+                packet
       \item<6-> Resend if no acknowledgement is received within a given timeout
     \end{itemize}
   \end{column}
@@ -397,6 +409,7 @@ badProg =
   \end{columns}
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Example: ARQ {\textendash} Verification challenges}
 
@@ -425,6 +438,7 @@ badProg =
     \end{itemize}
 
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Example: ARQ {\textendash} Our approach}
@@ -455,6 +469,7 @@ badProg =
 
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Example: ARQ {\textendash} Benefits of our approach}
 
@@ -471,17 +486,20 @@ badProg =
 
 \end{frame}
 
+
 \begin{frame}
   \frametitle{Conclusion}
 
   \begin{itemize}
-    \item Many verification tools exist, none of them cover enough on their own
+    \item<1-> Many verification tools exist, none of them cover enough on their
+              own
     \item<2-> Instead of ``competing'', we combine the systems to work together
     \item<3-> Hopefully this will lead to wider adoption and better whole-system
               soundness
   \end{itemize}
 
 \end{frame}
+
 
 \begin{frame}
   \frametitle{Questions}
