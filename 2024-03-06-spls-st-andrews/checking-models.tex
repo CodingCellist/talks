@@ -11,7 +11,7 @@
 \captionsetup[figure]{labelformat=empty}
 
 % for Idris syntax highlighting
-\usepackage{idrislang}
+\usepackage[styles]{idrislang}
 
 % slide url at the end
 \usepackage{hyperref}
@@ -48,24 +48,70 @@
 
 
 \begin{frame}
-  \frametitle{Introduction}
+  \frametitle{Overview}
 
   \begin{itemize}
-    \item<1-> We generally want software to be correct
-    \item<1-> Many approaches to this
-      \begin{itemize}
-        \item<2-> Test Driven Development (TDD)
-        \item<3-> Mutation testing
-        \item<4-> Property-based testing
-        \item<5-> Model Checking
-        \item<6-> Type theory
-        \item<7-> Mathematical abstractions and proofs
-      \end{itemize}
-    \item<8-> No one-size-fits-all
-      \begin{itemize}
-        \item<9-> So compromises are made
-      \end{itemize}
+    \item<1-> Many systems exhibit Finite State Machine (FSM)-like behaviour
+    \begin{itemize}
+      \item<1-> These can be neatly modelled with Dependent Types
+    \end{itemize}
+    \item<2-> Common example of this from Edwin Brady's ``Type Driven
+              Development with Idris'' book
+    \begin{itemize}
+      \item<2-> Turns out this example is subtly incorrect
+    \end{itemize}
+    \item<3-> How can we spot this?
+    \begin{itemize}
+      \item<3-> Who type-checks the types?
+    \end{itemize}
+    \item<4-> No one-size-fits-all
+    \item<5-> But we can hopefully catch errors faster and increase confidence
+              that our model behaves as intended
   \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{The ATM state machine}
+
+  \begin{center}
+  \begin{figure}
+    \begin{tikzpicture}[> = stealth, thick,
+                        roundnode/.style={circle, draw=black!100, minimum size=16mm},
+                        node distance=2cm and 3cm]
+      % ATM states %
+      \node [circle, draw=black!100, minimum size=14mm] {} ;
+      \node[roundnode] (st-ready) {Ready} ;
+      \node[roundnode] (st-card) [right=of st-ready, align=center] {\small Card\\\small inserted} ;
+      \node[roundnode] (st-session) [below=of st-ready] {Session} ;
+
+      % Arrows %
+      \draw [->] (st-ready.north east) -- (st-card.north west)
+            node [above, midway] {InsertCard} ;
+
+      \draw [->] (st-card.south west) -- (st-ready.south east)
+            node [below, midway] {Eject} ;
+      \draw [->] (st-card.south) -- (st-session.east)
+            node [right, midway, xshift=1pt, yshift=-1mm] {\small CheckPIN?(Correct)} ;
+
+      \draw [->] (st-session.north) -- (st-ready.south)
+            node [left, midway] {Eject} ;
+
+      % Lööps %
+      \draw [->] (st-card) to[loop above]
+            node [right, xshift=3mm, yshift=-5mm] {\footnotesize GetPIN!(PIN)}
+            () ;
+      \draw [->] (st-card) to[loop right]
+            node [below, xshift=3mm, yshift=-3mm] {\scriptsize CheckPIN?(Incorrect)}
+            () ;
+      \draw [->] (st-session) to[loop left]
+            node [below, xshift=2mm, yshift=-2mm] {\footnotesize Dispense} () ;
+    \end{tikzpicture}
+
+    \caption{State machine of an ATM}
+  \end{figure}
+  \end{center}
 
 \end{frame}
 
@@ -231,55 +277,98 @@
 
 
 \begin{frame}
-  \frametitle{Visuals can really help}
-  
-  \begin{center}
-  \begin{figure}
-    \begin{tikzpicture}[> = stealth, thick,
-                        roundnode/.style={circle, draw=black!100, minimum size=16mm},
-                        node distance=2cm and 3cm]
-      % ATM states %
-      \node [circle, draw=black!100, minimum size=14mm] {} ;
-      \node[roundnode] (st-ready) {Ready} ;
-      \node[roundnode] (st-card) [right=of st-ready, align=center] {\small Card\\\small inserted} ;
-      \node[roundnode] (st-session) [below=of st-ready] {Session} ;
+  \frametitle{Finite State Monads}
 
-      % Arrows %
-      \draw [->] (st-ready.north east) -- (st-card.north west)
-            node [above, midway] {InsertCard} ;
+  % TODO: try to get this nicer via Katla?
+  \vspace*{-3mm}
+  \idrisinput{ATM.idr}
+\end{frame}
 
-      \draw [->] (st-card.south west) -- (st-ready.south east)
-            node [below, midway] {Eject} ;
-      \draw [->] (st-card.south) -- (st-session.east)
-            node [right, midway, xshift=1pt, yshift=-1mm] {\small CheckPIN?(Correct)} ;
 
-      \draw [->] (st-session.north) -- (st-ready.south)
-            node [left, midway] {Eject} ;
+\begin{frame}
+  \frametitle{There are patterns in these}
+  \todo{Is this relevant for the talk?}
 
-      % Lööps %
-      \draw [->] (st-card) to[loop above]
-            node [right, xshift=3mm, yshift=-5mm] {\footnotesize GetPIN!(PIN)}
-            () ;
-      \draw [->] (st-card) to[loop right]
-            node [below, xshift=3mm, yshift=-3mm] {\scriptsize CheckPIN?(Incorrect)}
-            () ;
-      \draw [->] (st-session) to[loop left]
-            node [below, xshift=2mm, yshift=-2mm] {\footnotesize Dispense} () ;
-    \end{tikzpicture}
-
-    \caption{State machine of an ATM}
-  \end{figure}
-  \end{center}
+  \begin{itemize}
+    \item The \texttt{Bind}, \texttt{Seq}, and \texttt{Pure} commands are always
+          the same
+    \begin{enumerate}
+      \item Given a state, a result, and what to do next, can bind from state 1
+            to state 3
+      \item Trivially so if the result is \texttt{Unit}
+      \item And if we have a value, we can shove it in a state as long as the
+            state function accepts something of the value's type
+    \end{enumerate}
+    \item State-names map to \texttt{CMD} constructors
+    \item And dependent states' pattern-matches can be lifted to
+          \texttt{<...>Res} types
+  \end{itemize}
 
 \end{frame}
 
 
 \begin{frame}
-  \frametitle{Using types only gets you part of the way there}
+  \frametitle{How do you generate a dependent type?}
 
-  % TODO: try to get this nicer via Katla?
-  \vspace*{-3mm}
-  \idrisinput{ATM.idr}
+  \begin{itemize}
+    \item QuickCheck's bread and butter is \texttt{Arbitrary}
+    \begin{itemize}
+      \item Define how to generate an instance of a type, given some
+            pseudorandom number generator state
+      \item Reasonably straightforward for random numbers, picking an element,
+            and structures where the type of the constructors are known at
+            generation-time
+    \end{itemize}
+    \item However, our types are \textit{dependent}
+    \item So we cannot know the exact type at generation time
+    \begin{itemize}
+      \item We can know \textit{a} type, but not all. For example, \texttt{Vect
+            5 Nat} is fine
+      \item The problem is \texttt{Vect n Nat}
+      \item Or even \texttt{Arbitrary t $=>$ Vect n t}
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Arbitrary dependent types}
+  
+  \begin{itemize}
+    \item The solution is more dependent types!
+    \item Specifically: dependent pairs
+
+    \vspace*{-6mm}
+    \begin{idrislisting}
+record DPair a (p : a -> Type) where
+  constructor MkDPair
+  fst : a
+  snd : p fst
+    \end{idrislisting}
+    \vspace*{-3mm}
+
+    \item As long as we know how to generate an \texttt{Arbitrary a}, we can
+          generate an
+    \vspace*{-6mm}
+    \begin{idrislisting}
+Arbitrary a => Arbitrary (x : a ** p x)
+    \end{idrislisting}
+    \vspace*{-2mm}
+
+    \begin{itemize}
+      \item Coming back to vectors:
+      \vspace*{-6mm}
+      \begin{idrislisting}
+Arbitrary a => Arbitrary (n : Nat ** Vect n a)
+      \end{idrislisting}
+    \vspace*{-2mm}
+
+      \item (The \texttt{**} syntax is sugar for \texttt{DPair}/\texttt{MkDPair}
+            depending on the context)
+    \end{itemize}
+  \end{itemize}
+
 \end{frame}
 
 
