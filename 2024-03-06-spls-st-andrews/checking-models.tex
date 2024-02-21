@@ -65,6 +65,9 @@
       \item<3-> Who type-checks the types?
     \end{itemize}
     \item<4-> No one-size-fits-all
+    \begin{itemize}
+      \item<4-> How does QuickCheck fit with depedent types
+    \end{itemize}
     \item<5-> But we can hopefully catch errors faster and increase confidence
               that our model behaves as intended
   \end{itemize}
@@ -377,30 +380,8 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a)
 
   \begin{columns}
   \begin{column}{0.47\framewidth}
-    {\color{staMidGreen} Accepted by the compiler:}
-    %\vspace*{-5mm}
-    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
-atmProg : CMD ()
-            Ready (const Ready)
-atmProg =
-  do InsertCard
-     pin <- GetPIN
-     Correct <- CheckPIN pin
-       | Incorrect => EjectCard
-     amt <- GetAmount
-     Dispense amt 
-     EjectCard
-    \end{idrislisting}
-  \end{column}
-
-  \pause  % first show the good, then the bad code
-
-  \hspace*{-1.5mm}
-  \vrule{}
-
-  \begin{column}{0.53\framewidth}
     {\color{red} Rejected by the compiler:}
-    %\vspace*{-3mm}
+    \vspace*{-3mm}
     \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
 badProg : CMD ()
             Ready (const Ready)
@@ -411,8 +392,34 @@ badProg =
        | Incorrect => InsertCard
      amt <- GetAmount
      Dispense amt 
-     -- forgot to eject
+     -- we never EjectCard
     \end{idrislisting}
+  \end{column}
+
+  \pause  % first show the bad, then the dubious
+
+  \hspace*{-0.7mm}
+  \vrule{}
+
+  \begin{column}{0.53\framewidth}
+    {\color{orange} Accepted by the compiler:}
+    \vspace*{-3mm}
+    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+atmProg : CMD ()
+            Ready (const Ready)
+atmProg =
+  do InsertCard
+     pin <- GetPIN
+     _ <- CheckPIN pin
+     _ <- CheckPIN pin
+     _ <- CheckPIN pin
+     _ <- CheckPIN pin
+     <...>
+     amt <- GetAmount
+     Dispense amt 
+     EjectCard
+    \end{idrislisting}
+    \vspace*{-1cm}
   \end{column}
   \end{columns}
 \end{frame}
