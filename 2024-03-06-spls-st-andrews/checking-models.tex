@@ -229,66 +229,6 @@ atmProg =
 %% \end{frame}
 
 
-\begin{frame}
-  \frametitle{How do you generate a dependent type?}
-
-  \begin{itemize}
-    \item QuickCheck's bread and butter is \texttt{Arbitrary}
-    \begin{itemize}
-      \item Define how to generate an instance of a type, given some
-            pseudorandom number generator state
-      \item Reasonably straightforward for random numbers, picking an element,
-            and structures where the type of the constructors are known at
-            generation-time
-    \end{itemize}
-    \item However, our types are \textit{dependent}
-    \item So we cannot know the exact type at generation time
-    \begin{itemize}
-      \item We can know \textit{a} type, but not all. For example, \texttt{Vect
-            5 Nat} is fine
-      \item The problem is \texttt{Vect n Nat}
-      \item Or even \texttt{Arbitrary t $=>$ Vect n t}
-    \end{itemize}
-  \end{itemize}
-
-\end{frame}
-
-
-\begin{frame}[fragile]
-  \frametitle{Arbitrary dependent types}
-  
-  \begin{itemize}
-    \item The solution is more dependent types!
-    \item Specifically: dependent pairs
-
-    \vspace*{-6mm}
-    \begin{idrislisting}
-record DPair a (p : a -> Type) where
-  constructor MkDPair
-  fst : a
-  snd : p fst
-    \end{idrislisting}
-    \vspace*{-3mm}
-
-    \item As long as we know how to generate an {\textasciigrave
-          \texttt{Arbitrary a}\textasciigrave}, we can generate an
-          {\textasciigrave\texttt{Arbitrary (x : a ** p x)}\textasciigrave}
-    \item Coming back to vectors:
-    \vspace*{-6mm}
-    \begin{idrislisting}
-Arbitrary a => Arbitrary (n : Nat ** Vect n a)
-    \end{idrislisting}
-    \begin{itemize}
-    \vspace*{-2mm}
-
-      \item (The \texttt{**} syntax is sugar for \texttt{DPair}/\texttt{MkDPair}
-            depending on the context)
-    \end{itemize}
-  \end{itemize}
-
-\end{frame}
-
-
 \begin{frame}[fragile]
   \frametitle{Spectrum of Verification}
 
@@ -427,6 +367,66 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a)
     \draw<5-> [thick, color=staBlue] (tbox-tdd) -- (9.4, -0.5) ;
 
   \end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{How do you generate a dependent type?}
+
+  \begin{itemize}
+    \item QuickCheck's bread and butter is \texttt{Arbitrary}
+    \begin{itemize}
+      \item Define how to generate an instance of a type, given some
+            pseudorandom number generator state
+      \item Reasonably straightforward for random numbers, picking an element,
+            and structures where the type of the constructors are known at
+            generation-time
+    \end{itemize}
+    \item However, our types are \textit{dependent}
+    \item So we cannot know the exact type at generation time
+    \begin{itemize}
+      \item We can know \textit{a} type, but not all. For example, \texttt{Vect
+            5 Nat} is fine
+      \item The problem is \texttt{Vect n Nat}
+      \item Or even \texttt{Arbitrary t $=>$ Vect n t}
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Arbitrary dependent types}
+
+  \begin{itemize}
+    \item The solution is more dependent types!
+    \item Specifically: dependent pairs
+
+    \vspace*{-6mm}
+    \begin{idrislisting}
+record DPair a (p : a -> Type) where
+  constructor MkDPair
+  fst : a
+  snd : p fst
+    \end{idrislisting}
+    \vspace*{-3mm}
+
+    \item As long as we know how to generate an {\textasciigrave
+          \texttt{Arbitrary a}\textasciigrave}, we can generate an
+          {\textasciigrave\texttt{Arbitrary (x : a ** p x)}\textasciigrave}
+    \item Coming back to vectors:
+    \vspace*{-6mm}
+    \begin{idrislisting}
+Arbitrary a => Arbitrary (n : Nat ** Vect n a)
+    \end{idrislisting}
+    \begin{itemize}
+    \vspace*{-2mm}
+
+      \item (The \texttt{**} syntax is sugar for \texttt{DPair}/\texttt{MkDPair}
+            depending on the context)
+    \end{itemize}
+  \end{itemize}
 
 \end{frame}
 
