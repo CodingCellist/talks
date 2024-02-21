@@ -123,26 +123,27 @@
 \end{frame}
 
 
-\begin{frame}
-  \frametitle{There are patterns in these}
-  \todo{Is this relevant for the talk?}
-
-  \begin{itemize}
-    \item The \texttt{Bind}, \texttt{Seq}, and \texttt{Pure} commands are always
-          the same
-    \begin{enumerate}
-      \item Given a state, a result, and what to do next, can bind from state 1
-            to state 3
-      \item Trivially so if the result is \texttt{Unit}
-      \item And if we have a value, we can shove it in a state as long as the
-            state function accepts something of the value's type
-    \end{enumerate}
-    \item State-names map to \texttt{CMD} constructors
-    \item And dependent states' pattern-matches can be lifted to
-          \texttt{<...>Res} types
-  \end{itemize}
-
-\end{frame}
+%% FIXME: is this relevant for the talk?
+%% \begin{frame}
+%%   \frametitle{There are patterns in these}
+%%   \todo{Is this relevant for the talk?}
+%%
+%%   \begin{itemize}
+%%     \item The \texttt{Bind}, \texttt{Seq}, and \texttt{Pure} commands are always
+%%           the same
+%%     \begin{enumerate}
+%%       \item Given a state, a result, and what to do next, can bind from state 1
+%%             to state 3
+%%       \item Trivially so if the result is \texttt{Unit}
+%%       \item And if we have a value, we can shove it in a state as long as the
+%%             state function accepts something of the value's type
+%%     \end{enumerate}
+%%     \item State-names map to \texttt{CMD} constructors
+%%     \item And dependent states' pattern-matches can be lifted to
+%%           \texttt{<...>Res} types
+%%   \end{itemize}
+%%
+%% \end{frame}
 
 
 \begin{frame}
@@ -186,20 +187,15 @@ record DPair a (p : a -> Type) where
     \end{idrislisting}
     \vspace*{-3mm}
 
-    \item As long as we know how to generate an \texttt{Arbitrary a}, we can
-          generate an
+    \item As long as we know how to generate an {\textasciigrave
+          \texttt{Arbitrary a}\textasciigrave}, we can generate an
+          {\textasciigrave\texttt{Arbitrary (x : a ** p x)}\textasciigrave}
+    \item Coming back to vectors:
     \vspace*{-6mm}
     \begin{idrislisting}
-Arbitrary a => Arbitrary (x : a ** p x)
-    \end{idrislisting}
-    \vspace*{-2mm}
-
-    \begin{itemize}
-      \item Coming back to vectors:
-      \vspace*{-6mm}
-      \begin{idrislisting}
 Arbitrary a => Arbitrary (n : Nat ** Vect n a)
-      \end{idrislisting}
+    \end{idrislisting}
+    \begin{itemize}
     \vspace*{-2mm}
 
       \item (The \texttt{**} syntax is sugar for \texttt{DPair}/\texttt{MkDPair}
@@ -233,7 +229,7 @@ badProg =
 
   \pause  % first show the bad, then the dubious
 
-  \hspace*{-0.7mm}
+  \hspace*{-0.6mm}
   \vrule{}
 
   \begin{column}{0.53\framewidth}
