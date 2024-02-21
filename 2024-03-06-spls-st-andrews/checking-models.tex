@@ -123,6 +123,56 @@
 \end{frame}
 
 
+\begin{frame}[fragile]  % <--- N.B. `fragile` required for listing to work
+  \frametitle{Using types only gets you part of the way there}
+
+  \begin{columns}
+  \begin{column}{0.47\framewidth}
+    {\color{red} Rejected by the compiler:}
+    \vspace*{-3mm}
+    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+badProg : CMD ()
+            Ready (const Ready)
+badProg =
+  do InsertCard
+     pin <- GetPIN
+     Correct <- CheckPIN pin
+       | Incorrect => InsertCard
+     amt <- GetAmount
+     Dispense amt 
+     -- we never EjectCard
+    \end{idrislisting}
+  \end{column}
+
+  \pause  % first show the bad, then the dubious
+
+  \hspace*{-0.6mm}
+  \vrule{}
+
+  \begin{column}{0.53\framewidth}
+    {\color{orange} Accepted by the compiler:}
+    \vspace*{-3mm}
+    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+atmProg : CMD ()
+            Ready (const Ready)
+atmProg =
+  do InsertCard
+     pin <- GetPIN
+     _ <- CheckPIN pin
+     _ <- CheckPIN pin
+     _ <- CheckPIN pin
+     _ <- CheckPIN pin
+     <...>
+     amt <- GetAmount
+     Dispense amt 
+     EjectCard
+    \end{idrislisting}
+    \vspace*{-1cm}
+  \end{column}
+  \end{columns}
+\end{frame}
+
+
 %% FIXME: is this relevant for the talk?
 %% \begin{frame}
 %%   \frametitle{There are patterns in these}
@@ -203,56 +253,6 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a)
     \end{itemize}
   \end{itemize}
 
-\end{frame}
-
-
-\begin{frame}[fragile]  % <--- N.B. `fragile` required for listing to work
-  \frametitle{Using types only gets you part of the way there}
-
-  \begin{columns}
-  \begin{column}{0.47\framewidth}
-    {\color{red} Rejected by the compiler:}
-    \vspace*{-3mm}
-    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
-badProg : CMD ()
-            Ready (const Ready)
-badProg =
-  do InsertCard
-     pin <- GetPIN
-     Correct <- CheckPIN pin
-       | Incorrect => InsertCard
-     amt <- GetAmount
-     Dispense amt 
-     -- we never EjectCard
-    \end{idrislisting}
-  \end{column}
-
-  \pause  % first show the bad, then the dubious
-
-  \hspace*{-0.6mm}
-  \vrule{}
-
-  \begin{column}{0.53\framewidth}
-    {\color{orange} Accepted by the compiler:}
-    \vspace*{-3mm}
-    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
-atmProg : CMD ()
-            Ready (const Ready)
-atmProg =
-  do InsertCard
-     pin <- GetPIN
-     _ <- CheckPIN pin
-     _ <- CheckPIN pin
-     _ <- CheckPIN pin
-     _ <- CheckPIN pin
-     <...>
-     amt <- GetAmount
-     Dispense amt 
-     EjectCard
-    \end{idrislisting}
-    \vspace*{-1cm}
-  \end{column}
-  \end{columns}
 \end{frame}
 
 
