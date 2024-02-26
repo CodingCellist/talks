@@ -28,7 +28,8 @@
 %\usetheme{Flip}
 \usetheme{metropolis}
 
-\title{TBD}
+\title{Confidence in Types}
+%% TODO: find better subtitle
 \subtitle{Uniting the Spectrum of Verification}
 
 \author{Thomas Ekstr{\" o}m Hansen}
@@ -115,7 +116,7 @@
 
 
 \begin{frame}
-  \frametitle{Finite State Monads}
+  \frametitle{Indexed State Monads}
 
   % TODO: try to get this nicer via Katla?
   \vspace*{-3mm}
@@ -128,19 +129,21 @@
 
   \begin{columns}
   \begin{column}{0.47\framewidth}
-    {\color{red} Rejected by the compiler:}
+    {\color{red} Rejected by the type-checker:}
     \vspace*{-3mm}
     \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
 badProg : CMD ()
             Ready (const Ready)
-badProg =
-  do InsertCard
-     pin <- GetPIN
-     Correct <- CheckPIN pin
-       | Incorrect => InsertCard
-     amt <- GetAmount
-     Dispense amt 
-     -- we never EjectCard
+badProg = do
+  InsertCard
+  pin <- GetPIN
+  Correct <- CheckPIN pin
+    | Incorrect => InsertCard
+  amt <- GetAmount
+  Dispense amt 
+  -- We never EjectCard,
+  -- so we never come back
+  -- to `Ready'
     \end{idrislisting}
   \end{column}
 
@@ -150,24 +153,25 @@ badProg =
   \vrule{}
 
   \begin{column}{0.53\framewidth}
-    {\color{orange} Accepted by the compiler:}
+    {\color{orange} Accepted by the type-checker:}
     \vspace*{-3mm}
     \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
 atmProg : CMD ()
             Ready (const Ready)
-atmProg =
-  do InsertCard
-     pin <- GetPIN
-     _ <- CheckPIN pin
-     _ <- CheckPIN pin
-     _ <- CheckPIN pin
-     _ <- CheckPIN pin
-     <...>
-     amt <- GetAmount
-     Dispense amt 
-     EjectCard
+atmProg = do
+    InsertCard
+    pin <- GetPIN
+    loopIncorrect pin
+  where
+    loopIncorrect : Nat -> CMD ()
+                      CardInserted
+                      (const Ready)
+    loopIncorrect pin = do
+      Incorrect <- CheckPIN pin
+        | Correct => <...>
+      loopIncorrect pin
     \end{idrislisting}
-    \vspace*{-1cm}
+    \vspace*{-6mm}
   \end{column}
   \end{columns}
 \end{frame}
@@ -289,7 +293,7 @@ atmProg =
           % Also LaTeX:
           \setlength{\leftmargini}{2em}
           \begin{itemize}%[leftmargin=*]
-            \item CoQ, Agda, Isabelle \vspace*{-3pt}
+            \item CoQ/RoCQ, Agda, Isabelle \vspace*{-3pt}
             \item Very strong guarantees \vspace*{-3pt}
             \item Hard to write
           \end{itemize}
@@ -506,3 +510,4 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a)
 %% \end{frame}
 
 \end{document}
+
