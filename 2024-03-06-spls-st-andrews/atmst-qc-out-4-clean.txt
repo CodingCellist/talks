@@ -1,0 +1,10 @@
+MkQCRes (Just False) <log>
+"Falsifiable, after 4 tests:\n"
+  ""
+  "Starting @ Ready: "
+    "[ (<ATMOp 'Insert' with res '()'>, CardInserted)"
+    ", (<ATMOp 'CheckPIN 0' with res 'Incorrect'>, CardInserted)"
+    ", (<ATMOp 'CheckPIN 0' with res 'Incorrect'>, CardInserted)"
+    ", (<ATMOp 'CheckPIN 0' with res 'Incorrect'>, CardInserted)"
+    ", (<ATMOp 'CheckPIN 0' with res 'Incorrect'>, CardInserted)"
+    "]\n"
