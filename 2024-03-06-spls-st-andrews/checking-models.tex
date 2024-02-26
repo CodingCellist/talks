@@ -440,13 +440,17 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a)
 
   \begin{itemize}
     \item<1-> All verification systems face the same problem: ergonomics
-    \item<2-> If the system is not unobtrusive, people are unlikely to use it
+    \item<2-> If the system is obstructive, or even just perceived as such,
+              people are unlikely to use it
+    \begin{itemize}
+      \item ``Fighting with the Rust borrow-checker'' is a common phrase
+    \end{itemize}
     \item<3-> Our hope is that our approach tries to not get in the way by being
               part of the program
       \begin{itemize}
         \item<4-> Compiler and type-system assist you rather than hinder
         \item<5-> Verify as you go along, tuning the strictness as necessary
-        \item<6-> Escape hatches provided for prototyping
+        \item<6-> Escape-hatches provided for prototyping
       \end{itemize}
   \end{itemize}
 
