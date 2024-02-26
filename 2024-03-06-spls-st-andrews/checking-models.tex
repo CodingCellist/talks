@@ -391,7 +391,7 @@ atmProg = do
     \item So we cannot know the exact type at generation time
     \begin{itemize}
       \item We can know \textit{a} type, but not all. For example, \texttt{Vect
-            5 Nat} is fine
+            3 Nat} is trivial: \texttt{[!arbitrary, !arbitrary, !arbitrary]}
       \item The problem is \texttt{Vect n Nat}
       \item Or even \texttt{Arbitrary t $=>$ Vect n t}
     \end{itemize}
@@ -419,20 +419,48 @@ record DPair a (p : a -> Type) where
     \item As long as we know how to generate an {\textasciigrave
           \texttt{Arbitrary a}\textasciigrave}, we can generate an
           {\textasciigrave\texttt{Arbitrary (x : a ** p x)}\textasciigrave}
-    \item Coming back to vectors:
-    \vspace*{-6mm}
-    \begin{idrislisting}
-Arbitrary a => Arbitrary (n : Nat ** Vect n a)
-    \end{idrislisting}
     \begin{itemize}
-    \vspace*{-2mm}
-
       \item (The \texttt{**} syntax is sugar for \texttt{DPair}/\texttt{MkDPair}
             depending on the context)
     \end{itemize}
   \end{itemize}
 
 \end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Arbitrary vectors}
+
+  \begin{itemize}
+  \item To generate an arbitrary vector, we generate \textit{some} length\dots
+  \item \dots\ and then generate that many \textasciigrave
+        \texttt{arbitrary}\textasciigrave elements
+  \end{itemize}
+
+  \vspace*{-5mm}
+
+  \begin{idrislisting}
+Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
+  arbitrary = do
+    len <- arbitrary
+    pure (len ** replicateM len)
+  where
+    replicateM : (n : Nat) -> Gen (Vect n a)
+    replicateM 0 = []
+    replicateM (S k) = !arbitrary :: replicateM k
+  \end{idrislisting}
+
+\end{frame}
+
+
+%%\begin{frame}
+%%  \frametitle{Arbitrary vectors}
+%%
+%%  \begin{itemize}
+%%  \item To generate an arbitrary vector, we generate \textit{some} length\dots
+%%  \end{itemize}
+%%
+%%\end{frame}
 
 
 \begin{frame}
@@ -443,7 +471,8 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a)
     \item<2-> If the system is obstructive, or even just perceived as such,
               people are unlikely to use it
     \begin{itemize}
-      \item ``Fighting with the Rust borrow-checker'' is a common phrase
+      \item ``Fighting with the Rust borrow-checker''
+      \item ``I'm experienced enough, writing safe C/C++ is easier''
     \end{itemize}
     \item<3-> Our hope is that our approach tries to not get in the way by being
               part of the program
