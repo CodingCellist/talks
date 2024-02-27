@@ -6,5 +6,5 @@ typed model of the system is erroneous, the type checker can also,
 unintentionally, create a false sense of security. We present an example of how
 this kind of mistake can be subtly hidden, along with work on integrating
 QuickCheck at the type level, the result being type-driven development with
-increased confidence that our models are correct.
+increased confidence that our types are correct.
 
