@@ -1,20 +1,19 @@
-data State  =  Ready | CardInserted | Session
+data ATMSt =  Ready | CardInserted | Session
 
 data CheckPINRes  =  Incorrect | Correct
 
-data CMD : (ty : Type) -> State -> (ty -> State) -> Type
+data ATMOp : (ty : Type) -> ATMSt -> (ty -> ATMSt) -> Type
   where
-  InsertCard : CMD () Ready (const CardInserted)
-  Dispense   : CMD () Session (const Session)
-  GetPIN     : CMD () CardInserted (const CardInserted)
+  InsertCard : ATMOp () Ready (const CardInserted)
+  Dispense   :  (amt : Nat)
+             -> ATMOp () Session (const Session)
 
-  CheckPIN   : (Vect 4 Nat)
-             -> CMD CheckPINRes CardInserted
-                    (\res => case res of
-                               Incorrect => CardInserted
-                               Correct => Session)
+  CheckPIN   : Nat
+             -> ATMOp CheckPINRes CardInserted
+                    (\case Incorrect => CardInserted
+                           Correct => Session)
 
-  GetAmount  : CMD Nat state (const state)
+  GetAmount  : ATMOp Nat state (const state)
 
-  EjectCard  : CMD () state (const Ready)
+  EjectCard  : ATMOp () state (const Ready)
 

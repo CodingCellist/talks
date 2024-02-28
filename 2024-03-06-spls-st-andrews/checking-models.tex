@@ -116,13 +116,57 @@
 
 
 \begin{frame}
-  \frametitle{Indexed State Monads}
+  \frametitle{Indexed State Monads (ISMs)}
 
   % TODO: try to get this nicer via Katla?
   \vspace*{-3mm}
   \idrisinput{ATM.idr}
 \end{frame}
 
+
+\begin{frame}[fragile]
+  \frametitle{Using the operations}
+
+  \begin{itemize}
+    \item Using the ISM operations requires another ISM
+    \item Defining \texttt{pure}, \texttt{op}, \texttt{bind}, and \texttt{seq}
+  \end{itemize}
+
+  \begin{idrislisting}
+data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
+  where
+  Pure : (x : t) -> ATM t (stFn x) stFn
+  Op : ATMOp t st st' -> ATM t st st'
+  (>>=) :  ATM a s1 s2f -> ((x : a) -> ATM b (s2f x) s3f)
+        -> ATM b s1 s3f
+  (>>) :  ATM () s1 s2f -> (ATM b (s2f ()) s3f)
+       -> ATM b s1 s3f
+  \end{idrislisting}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Programming with ISMs}
+
+  \begin{itemize}
+    \item We declare our intended start and end state in the type
+    \item And the type-checker verifies that we don't use commands incorrectly
+  \end{itemize}
+
+  \vspace*{-5mm}
+
+  \begin{idrislisting}
+  prog : ATM () Ready (const Ready)
+  prog = do
+    Op Insert
+    Correct <- Op $ CheckPIN 1234
+      | Incorrect => <...>
+    amount <- Op GetAmount
+    Op $ Dispense amount
+    Op Eject
+  \end{idrislisting}
+
+\end{frame}
 
 \begin{frame}[fragile]  % <--- N.B. `fragile` required for listing to work
   \frametitle{Using types only gets you part of the way there}
@@ -136,7 +180,7 @@ badProg : CMD ()
             Ready (const Ready)
 badProg = do
   InsertCard
-  pin <- GetPIN
+  let pin = 1234
   Correct <- CheckPIN pin
     | Incorrect => InsertCard
   amt <- GetAmount
@@ -160,7 +204,7 @@ atmProg : CMD ()
             Ready (const Ready)
 atmProg = do
     InsertCard
-    pin <- GetPIN
+    let pin = 4321
     loopIncorrect pin
   where
     loopIncorrect : Nat -> CMD ()
@@ -181,9 +225,9 @@ atmProg = do
   \frametitle{Why is this a problem?}
 
   \begin{itemize}
-    \item<1-> Our expectations clash with our model
+    \item<1-> We expect an ATM to reject the card after 3 PIN attempts
     \begin{itemize}
-      \item<2-> The ATM should not allow us to just try PINs forever
+      \item<2-> Not to be permanently unavailable if we retry forever
     \end{itemize}
     \item<3-> However, the programmer is unlikely to catch this
     \item<4-> The FSM looks correct and rigorous, after all
@@ -376,6 +420,35 @@ atmProg = do
 
 
 \begin{frame}
+  \frametitle{The eternal problem with verification systems}
+
+  \begin{itemize}
+    \item<1-> All verification systems face the same problem: ergonomics
+    \item<2-> If the system is obstructive, or even just perceived as such,
+              people are unlikely to use it
+    \begin{itemize}
+      \item This is especially true for complex systems
+      \item ``Fighting with the Rust borrow-checker''
+      \item ``I'm experienced enough to write safe C/C++''
+    \end{itemize}
+    \item<3-> Where does Idris fit in here?
+      \begin{itemize}
+        \item<4-> Allows us to target all areas of the spectrum
+        \item<5-> Compiler and type-system assist you rather than hinder
+        \item<6-> Verify as you go along, tuning the strictness as necessary
+        \item<7-> Unit tests are not thorough enough, so QuickCheck seems like a
+                  good middle ground
+        \item<8-> Dependent types allow us to run the tests at compile time, and
+                  linearity to erase their results at runtime
+      \end{itemize}
+  \end{itemize}
+
+  \vspace*{-5mm}
+
+\end{frame}
+
+
+\begin{frame}
   \frametitle{How do you generate a dependent type?}
 
   \begin{itemize}
@@ -443,45 +516,27 @@ record DPair a (p : a -> Type) where
 Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
   arbitrary = do
     len <- arbitrary
-    pure (len ** replicateM len)
+    pure (len ** nArbitrary len)
   where
-    replicateM : (n : Nat) -> Gen (Vect n a)
-    replicateM 0 = []
-    replicateM (S k) = !arbitrary :: replicateM k
+    nArbitrary : (n : Nat) -> Gen (Vect n a)
+    nArbitrary 0 = []
+    nArbitrary (S k) = !arbitrary :: nArbitrary k
   \end{idrislisting}
 
 \end{frame}
 
 
-%%\begin{frame}
-%%  \frametitle{Arbitrary vectors}
-%%
-%%  \begin{itemize}
-%%  \item To generate an arbitrary vector, we generate \textit{some} length\dots
-%%  \end{itemize}
-%%
-%%\end{frame}
-
-
 \begin{frame}
-  \frametitle{The eternal problem with verification systems}
+  \frametitle{Properties of the ATM}
 
   \begin{itemize}
-    \item<1-> All verification systems face the same problem: ergonomics
-    \item<2-> If the system is obstructive, or even just perceived as such,
-              people are unlikely to use it
-    \begin{itemize}
-      \item ``Fighting with the Rust borrow-checker''
-      \item ``I'm experienced enough, writing safe C/C++ is easier''
-    \end{itemize}
-    \item<3-> Our hope is that our approach tries to not get in the way by being
-              part of the program
-      \begin{itemize}
-        \item<4-> Compiler and type-system assist you rather than hinder
-        \item<5-> Verify as you go along, tuning the strictness as necessary
-        \item<6-> Escape-hatches provided for prototyping
-      \end{itemize}
+    \item Generating arbitrary ATM steps is a bit more involved, but doable
+          \todo{details of this rather than Vect?}
+    \item Once we have that, we can specify properties like\\
+          ``Within 5 states, we should have returned to \texttt{Ready}''
   \end{itemize}
+
+  \todo{Show it failing}
 
 \end{frame}
 
