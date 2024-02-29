@@ -622,14 +622,44 @@ record DPair a (p : a -> Type) where
 \end{frame}
 
 
+\begin{frame}[fragile]
+  \frametitle{Fixing things}
+
+  \begin{itemize}
+    \item<1-> Now that we know there's an error, we can fix things!
+  \end{itemize}
+
+  \pause
+
+  \vspace*{-5mm}
+  \idrisinput{qc-things/ATM-fixed-chkpin.idr}
+  \vspace*{-3mm}
+
+  \pause
+
+  \begin{itemize}
+    \item Carrying this through to the generators, our QC passes: file reloads
+          successfully, the REPL reports
+          \vspace*{-5mm}
+          \begin{idrislisting}
+> QuickCheck PROP_eventuallyReady
+MkQCRes (Just True) <log> "OK: 100 tests passed"
+          \end{idrislisting}
+  \end{itemize}
+
+\end{frame}
+
+
 \begin{frame}
   \frametitle{Benefits of a multifaceted approach}
 
-  \todo{Ideally have a fixed version before this}
-
   \begin{enumerate}
-    \item<1-> Adaptability {\textemdash} right tool for the job
+    \item<1-> Adaptability {\textemdash} being able to use different tools
     \item<2-> Speed {\textemdash} can trade speed for level of verification
+    \begin{itemize}
+      \item<2-> This isn't about proving things, it is about increasing
+                confidence in our typed models
+    \end{itemize}
     \item<3-> \textbf{Coherence} {\textemdash} all done in one system
       \begin{itemize}
         \item<4-> No need to translate to model-checking tool
@@ -644,18 +674,20 @@ record DPair a (p : a -> Type) where
 \end{frame}
 
 
-\begin{frame}
-  \frametitle{Conclusion}
-
-  \begin{itemize}
-    \item<1-> Many verification tools exist, none of them cover enough on their
-              own
-    \item<2-> Instead of ``competing'', we combine the systems to work together
-    \item<3-> Hopefully this will lead to wider adoption and better whole-system
-              soundness
-  \end{itemize}
-
-\end{frame}
+%% FIXME: is this necessary?
+%%
+%% \begin{frame}
+%%   \frametitle{Conclusion}
+%% 
+%%   \begin{itemize}
+%%     \item<1-> Many verification tools exist, none of them cover enough on their
+%%               own
+%%     \item<2-> Instead of ``competing'', we combine the systems to work together
+%%     \item<3-> Hopefully this will lead to wider adoption and better whole-system
+%%               soundness
+%%   \end{itemize}
+%% 
+%% \end{frame}
 
 
 \begin{frame}
@@ -668,6 +700,7 @@ record DPair a (p : a -> Type) where
 \end{frame}
 
 %% TODO
+%%
 %% \begin{frame}
 %%   \frametitle{Slides}
 %% 
