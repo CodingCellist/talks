@@ -1,6 +1,5 @@
 record OpRes (resT : Type) (currSt : ATMState)
-             (nsFn : resT -> ATMState)
-  where
+             (nsFn : resT -> ATMState) where
   constructor MkOpRes
 
   -- The operation

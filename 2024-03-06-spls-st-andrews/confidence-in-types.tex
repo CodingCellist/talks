@@ -10,8 +10,13 @@
 \usepackage{caption}
 \captionsetup[figure]{labelformat=empty}
 
-% for Idris syntax highlighting
-\usepackage[styles]{idrislang}
+%% % for Idris syntax highlighting
+%% \usepackage[styles]{idrislang}
+
+\usepackage{minted}
+\setminted{
+  fontsize=\small
+}
 
 % slide url at the end
 \usepackage{hyperref}
@@ -120,9 +125,9 @@
 \begin{frame}
   \frametitle{Indexed State Monads (ISMs)}
 
-  % TODO: try to get this nicer via minted?
-  \vspace*{-3mm}
-  \idrisinput{qc-things/ATM.idr}
+  \vspace*{-1mm}
+  \inputminted{Idris}{qc-things/ATM.idr}
+
 \end{frame}
 
 
@@ -131,12 +136,13 @@
 
   \begin{itemize}
     \item<1-> Using the ISM operations requires another ISM, defining
-              \texttt{pure}, \texttt{op}, \texttt{bind}, and \texttt{seq}
+              \mintinline{Idris}{pure}, \mintinline{Idris}{op},
+              \mintinline{Idris}{bind}, and \mintinline{Idris}{seq}
   \end{itemize}
 
   \pause
 
-  \begin{idrislisting}
+  \begin{minted}{Idris}
 data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
   where
   Pure : (x : t) -> ATM t (stFn x) stFn
@@ -145,7 +151,7 @@ data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
         -> ATM b s1 s3f
   (>>) :  ATM () s1 s2f -> (ATM b (s2f ()) s3f)
        -> ATM b s1 s3f
-  \end{idrislisting}
+  \end{minted}
 \end{frame}
 
 
@@ -154,14 +160,15 @@ data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
 
   \begin{itemize}
     \item<1-> We declare our intended start and end state in the type
-    \item<2-> And the type-checker verifies that we don't use commands incorrectly
+    \item<2-> And the type-checker verifies that we don't use commands
+              incorrectly
   \end{itemize}
-
-  \vspace*{-5mm}
 
   \pause
 
-  \begin{idrislisting}
+  \begin{center}
+  \begin{minipage}{0.9\textwidth}
+  \begin{minted}{Idris}
   prog : ATM () Ready (const Ready)
   prog = do
     Op Insert
@@ -170,7 +177,9 @@ data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
     amount <- Op GetAmount
     Op $ Dispense amount
     Op Eject
-  \end{idrislisting}
+  \end{minted}
+  \end{minipage}
+  \end{center}
 
 \end{frame}
 
@@ -180,8 +189,8 @@ data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
   \begin{columns}
   \begin{column}{0.47\framewidth}
     {\color{red} Rejected by the type-checker:}
-    \vspace*{-3mm}
-    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+    \vspace*{1mm}
+    \begin{minted}[fontsize=\footnotesize]{Idris}
 badProg : ATM ()
             Ready (const Ready)
 badProg = do
@@ -194,7 +203,8 @@ badProg = do
   -- We never Eject, so we
   -- never come back to
   -- `Ready'
-    \end{idrislisting}
+    \end{minted}
+    \vspace*{2.5mm}
   \end{column}
 
   \pause  % first show the bad, then the dubious
@@ -204,8 +214,8 @@ badProg = do
 
   \begin{column}{0.53\framewidth}
     {\color{orange} Accepted by the type-checker:}
-    \vspace*{-3mm}
-    \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
+    \vspace*{1mm}
+    \begin{minted}[fontsize=\footnotesize]{Idris}
 loopProg : CMD ()
             Ready (const Ready)
 loopProg = do
@@ -218,9 +228,9 @@ loopProg = do
                       (const Ready)
     loopIncorrect p = do
       Incorrect <- Op $ CheckPIN p
-        | Correct => <...>
+        | Correct => -- <...>
       loopIncorrect p
-    \end{idrislisting}
+    \end{minted}
     \vspace*{-6mm}
   \end{column}
   \end{columns}
@@ -267,18 +277,18 @@ loopProg = do
 %%   \todo{Is this relevant for the talk?}
 %%
 %%   \begin{itemize}
-%%     \item The \texttt{Bind}, \texttt{Seq}, and \texttt{Pure} commands are always
-%%           the same
+%%     \item The \mintinline{Idris}{Bind}, \mintinline{Idris}{Seq}, and
+%%           \mintinline{Idris}{Pure} commands are always the same
 %%     \begin{enumerate}
 %%       \item Given a state, a result, and what to do next, can bind from state 1
 %%             to state 3
-%%       \item Trivially so if the result is \texttt{Unit}
+%%       \item Trivially so if the result is \mintinline{Idris}{Unit}
 %%       \item And if we have a value, we can shove it in a state as long as the
 %%             state function accepts something of the value's type
 %%     \end{enumerate}
-%%     \item State-names map to \texttt{CMD} constructors
+%%     \item State-names map to \mintinline{Idris}{CMD} constructors
 %%     \item And dependent states' pattern-matches can be lifted to
-%%           \texttt{<...>Res} types
+%%           \mintinline{Idris}{<...>Res} types
 %%   \end{itemize}
 %%
 %% \end{frame}
@@ -459,7 +469,7 @@ loopProg = do
   \frametitle{How do you generate a dependent type?}
 
   \begin{itemize}
-    \item<1-> QuickCheck's bread and butter is \texttt{Arbitrary}
+    \item<1-> QuickCheck's bread and butter is \mintinline{Idris}{Arbitrary}
     \begin{itemize}
       \item<2-> Define how to generate an instance of a type, given some
             pseudorandom number generator state
@@ -471,10 +481,10 @@ loopProg = do
     \item<4-> So we cannot know the exact type at generation time
     \begin{itemize}
       \item<5-> We can know \textit{a} type, but not all. For example,
-                \texttt{Vect 3 Nat} is trivial: \texttt{[!arbitrary, !arbitrary,
-                !arbitrary]}
-      \item<6-> The problem is \texttt{Vect n Nat}
-      \item<7-> Or even \texttt{Arbitrary t $=>$ Vect n t}
+                \mintinline{Idris}{Vect 3 Nat} is trivial:
+                \mintinline{Idris}{[!arbitrary, !arbitrary, !arbitrary]}
+      \item<6-> The problem is\hspace*{2mm} \mintinline{Idris}{Vect n Nat}
+      \item<7-> Or even\hspace*{2mm} \mintinline{Idris}{Arbitrary t => Vect n t}
     \end{itemize}
   \end{itemize}
 
@@ -488,21 +498,22 @@ loopProg = do
     \item<1-> The solution is more dependent types!
     \item<2-> Specifically: dependent pairs
 
-    \vspace*{-6mm}
-    \begin{idrislisting}<2->
+    %\vspace*{-1mm}  % <2->
+    \begin{minted}{Idris}
 record DPair a (p : a -> Type) where
   constructor MkDPair
   fst : a
   snd : p fst
-    \end{idrislisting}
-    \vspace*{-3mm}
+    \end{minted}
+    %\vspace*{-1mm}
 
     \item<3-> As long as we know how to generate an {\textasciigrave
-              \texttt{Arbitrary a}\textasciigrave}, we can generate an
-              {\textasciigrave\texttt{Arbitrary (x : a ** p x)}\textasciigrave}
+              \mintinline{Idris}{Arbitrary a}\textasciigrave}, we can generate an
+              {\textasciigrave\mintinline{Idris}{Arbitrary (x : a ** p x)}\textasciigrave}
     \begin{itemize}
-      \item<3-> (The \texttt{**} syntax is sugar for
-                \texttt{DPair}/\texttt{MkDPair} depending on the context)
+      \item<3-> (The \mintinline{Idris}{**} syntax is sugar for
+                \mintinline{Idris}{DPair} / \mintinline{Idris}{MkDPair}
+                depending on the context)
     \end{itemize}
   \end{itemize}
 
@@ -517,12 +528,12 @@ record DPair a (p : a -> Type) where
 %%   \begin{itemize}
 %%   \item To generate an arbitrary vector, we generate \textit{some} length\dots
 %%   \item \dots\ and then generate that many \textasciigrave
-%%         \texttt{arbitrary}\textasciigrave elements
+%%         \mintinline{Idris}{arbitrary}\textasciigrave elements
 %%   \end{itemize}
 %% 
 %%   \vspace*{-5mm}
 %% 
-%%   \begin{idrislisting}
+%%   \begin{minted}{Idris}
 %% Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
 %%   arbitrary = do
 %%     len <- arbitrary
@@ -531,7 +542,7 @@ record DPair a (p : a -> Type) where
 %%     nArbitrary : (n : Nat) -> Gen (Vect n a)
 %%     nArbitrary 0 = []
 %%     nArbitrary (S k) = !arbitrary :: nArbitrary k
-%%   \end{idrislisting}
+%%   \end{minted}
 %% 
 %% \end{frame}
 
@@ -539,7 +550,7 @@ record DPair a (p : a -> Type) where
 \begin{frame}[fragile]
   \frametitle{Plumbing for operations}
 
-  \idrisinput{qc-things/ATM-opres.idr}
+  \inputminted{Idris}{qc-things/ATM-opres.idr}
 
 \end{frame}
 
@@ -547,7 +558,7 @@ record DPair a (p : a -> Type) where
 \begin{frame}[fragile]
   \frametitle{Tracing ATMs}
 
-  \idrisinput{qc-things/ATM-tracing.idr}
+  \inputminted[fontsize=\footnotesize]{Idris}{qc-things/ATM-tracing.idr}
 
 \end{frame}
 
@@ -555,8 +566,8 @@ record DPair a (p : a -> Type) where
 \begin{frame}[fragile]
   \frametitle{Generating arbitrary OpRes}
 
-  \vspace*{-2mm}
-  \idrisinput{qc-things/ATM-arb-opres.idr}
+  %\vspace*{-2mm}
+  \inputminted[fontsize=\scriptsize]{Idris}{qc-things/ATM-arb-opres.idr}
 
 \end{frame}
 
@@ -569,14 +580,13 @@ record DPair a (p : a -> Type) where
               involved than non-dependent types, but it is doable
     \item<2-> And now that we have that, we can specify properties like\\
               ``Within 5 state-transitions, we should be back in
-              {\textasciigrave\texttt{Ready}\textasciigrave}''
-              \vspace*{-5mm}
-              \idrisinput{qc-things/ATM-props.idr}
-              \vspace*{-2mm}
+              \mintinline{Idris}{Ready}''
+              \vspace*{-1mm}
+              \inputminted{Idris}{qc-things/ATM-props.idr}
     \item<3-> \textit{And} we can test it at compile-time
-              \vspace*{-5mm}
-              \idrisinput{qc-things/ATM-qc-props.idr}
-              \vspace*{-2mm}
+              \vspace*{-1mm}
+              \inputminted{Idris}{qc-things/ATM-qc-props.idr}
+              \vspace*{-3mm}
   \end{itemize}
 
 \end{frame}
@@ -595,12 +605,11 @@ record DPair a (p : a -> Type) where
       \item<2-> Might think we're verifying the same thing, when in actual fact
                 the semantics have changed between representations
     \end{itemize}
-    \item<3-> In our case, the specification \textit{is} the model; everywhere
+    \item<3-> In our case, the specification \textit{is} the model;
+              \textit{everywhere}
+              \vspace*{1mm}
+              \inputminted[fontsize=\footnotesize]{Idris}{qc-things/ATM-arb-trace.idr}
   \end{itemize}
-
-  \vspace*{-5mm}
-  \idrisinput{qc-things/ATM-arb-trace.idr}
-  \vspace*{-5mm}
 
 \end{frame}
 
@@ -610,13 +619,13 @@ record DPair a (p : a -> Type) where
 
   \begin{itemize}
     \item<1-> If we try to type-check the file we get:
-              \vspace*{-5mm}
-              \idrisinput{qc-things/ATM-qc-error.idr}
+              \vspace*{1mm}
+              \inputminted[fontsize=\scriptsize]{Idris}{qc-things/ATM-qc-error.idr}
     \item<2-> And if we investigate by running QC at the REPL, the error is
               exactly the fault in the model:
-              \vspace*{-5mm}
-              \idrisinput{qc-things/qc-trace-4.idr}
-              \vspace*{-2mm}
+              \vspace*{1mm}
+              \inputminted[fontsize=\scriptsize]{Idris}{qc-things/qc-trace-4.idr}
+              \vspace*{-4mm}
   \end{itemize}
 
 \end{frame}
@@ -627,25 +636,17 @@ record DPair a (p : a -> Type) where
 
   \begin{itemize}
     \item<1-> Now that we know there's an error, we can fix things!
-  \end{itemize}
+              \inputminted[fontsize=\scriptsize]{Idris}{qc-things/ATM-fixed-chkpin.idr}
 
-  \pause
-
-  \vspace*{-5mm}
-  \idrisinput{qc-things/ATM-fixed-chkpin.idr}
-  \vspace*{-3mm}
-
-  \pause
-
-  \begin{itemize}
-    \item Carrying this through to the generators, our QC passes: file reloads
-          successfully, the REPL reports
-          \vspace*{-5mm}
-          \begin{idrislisting}
+    \item<2-> Carrying this through to the generators, our QC passes: file reloads
+              successfully, the REPL reports
+              \begin{minted}[fontsize=\scriptsize]{Idris}
 > QuickCheck PROP_eventuallyReady
 MkQCRes (Just True) <log> "OK: 100 tests passed"
-          \end{idrislisting}
+              \end{minted}
   \end{itemize}
+
+  \vspace*{-3mm}
 
 \end{frame}
 
@@ -723,7 +724,6 @@ MkQCRes (Just True) <log> "OK: 100 tests passed"
 %%   \begin{center}
 %%     \begin{figure}
 %%       \includegraphics[width=0.35\framewidth]{qr-code.png}
-%%       \caption{\href{https://github.com/CodingCellist/talks/blob/main/2024-03-06-slps-st-andrews}{github.com/CodingCellist/talks}}
 %%     \end{figure}
 %%   \end{center}
 %% 
