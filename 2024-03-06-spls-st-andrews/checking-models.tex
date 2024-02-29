@@ -582,6 +582,29 @@ record DPair a (p : a -> Type) where
 \end{frame}
 
 
+\begin{frame}[fragile]
+  \frametitle{Model, verification, and implementation all-in-one}
+
+  \begin{itemize}
+    \item<1-> With most verification tools, we have to translate between models
+    \begin{itemize}
+      \item<1-> Spec, model, and implementation are independent
+    \end{itemize}
+    \item<2-> This facilitates translation mistakes
+    \begin{itemize}
+      \item<2-> Might think we're verifying the same thing, when in actual fact
+                the semantics have changed between representations
+    \end{itemize}
+    \item<3-> In our case, the specification \textit{is} the model; everywhere
+  \end{itemize}
+
+  \vspace*{-5mm}
+  \idrisinput{qc-things/ATM-arb-trace.idr}
+  \vspace*{-5mm}
+
+\end{frame}
+
+
 \begin{frame}
   \frametitle{QuickCheck spots the error!}
 
