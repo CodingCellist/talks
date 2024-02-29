@@ -120,7 +120,7 @@
 
   % TODO: try to get this nicer via Katla?
   \vspace*{-3mm}
-  \idrisinput{ATM.idr}
+  \idrisinput{qc-things/ATM.idr}
 \end{frame}
 
 
@@ -200,9 +200,9 @@ badProg = do
     {\color{orange} Accepted by the type-checker:}
     \vspace*{-3mm}
     \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
-atmProg : CMD ()
+loopProg : CMD ()
             Ready (const Ready)
-atmProg = do
+loopProg = do
     InsertCard
     let pin = 4321
     loopIncorrect pin
