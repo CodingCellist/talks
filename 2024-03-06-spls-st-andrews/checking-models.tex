@@ -43,6 +43,8 @@
 
 %%%%% DOCUMENT %%%%%
 
+% /!\     N.B.: `fragile` required for listing to work     /!\
+
 \begin{document}
 
 \maketitle
@@ -64,8 +66,8 @@
     \item<3-> How can we spot this? Can we increase confidence in our type-level
               modelling without having to ``just get it right''?
     \item<4-> Spoilers: How does QuickCheck fit in with dependent types?
-    \item<5-> No panacea, but we can hopefully catch errors faster and have some
-              guarantees that our model behaves as intended
+    \item<5-> No silver bullet, but we can hopefully catch errors faster and
+              have some guarantees that our model behaves as intended
   \end{itemize}
 
 \end{frame}
@@ -118,7 +120,7 @@
 \begin{frame}
   \frametitle{Indexed State Monads (ISMs)}
 
-  % TODO: try to get this nicer via Katla?
+  % TODO: try to get this nicer via minted?
   \vspace*{-3mm}
   \idrisinput{qc-things/ATM.idr}
 \end{frame}
@@ -128,9 +130,11 @@
   \frametitle{Using the operations}
 
   \begin{itemize}
-    \item Using the ISM operations requires another ISM
-    \item Defining \texttt{pure}, \texttt{op}, \texttt{bind}, and \texttt{seq}
+    \item<1-> Using the ISM operations requires another ISM, defining
+              \texttt{pure}, \texttt{op}, \texttt{bind}, and \texttt{seq}
   \end{itemize}
+
+  \pause
 
   \begin{idrislisting}
 data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
@@ -149,11 +153,13 @@ data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
   \frametitle{Programming with ISMs}
 
   \begin{itemize}
-    \item We declare our intended start and end state in the type
-    \item And the type-checker verifies that we don't use commands incorrectly
+    \item<1-> We declare our intended start and end state in the type
+    \item<2-> And the type-checker verifies that we don't use commands incorrectly
   \end{itemize}
 
   \vspace*{-5mm}
+
+  \pause
 
   \begin{idrislisting}
   prog : ATM () Ready (const Ready)
@@ -168,7 +174,7 @@ data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
 
 \end{frame}
 
-\begin{frame}[fragile]  % <--- N.B. `fragile` required for listing to work
+\begin{frame}[fragile]
   \frametitle{Using types only gets you part of the way there}
 
   \begin{columns}
@@ -227,12 +233,12 @@ loopProg = do
   \begin{itemize}
     \item<1-> We expect an ATM to reject the card after 3 PIN attempts
     \begin{itemize}
-      \item<2-> Not to be permanently unavailable if we retry forever
+      \item<1-> Not to be permanently unavailable if we retry forever
     \end{itemize}
-    \item<3-> However, the programmer is unlikely to catch this
-    \item<4-> The model looks correct and rigorous, after all
-    \item<5-> Programming with it will catch most errors
-    \item<6-> And the type-checker is happy with our sequence of operations
+    \item<2-> However, the programmer is unlikely to catch this
+    \item<3-> The model looks correct and rigorous, after all
+    \item<4-> Programming with it will catch most errors
+    \item<5-> And the type-checker is happy with our sequence of operations
   \end{itemize}
 \end{frame}
 
@@ -428,19 +434,19 @@ loopProg = do
     \item<2-> If the system is obstructive, or even just perceived as such,
               people are unlikely to use it
     \begin{itemize}
-      \item This is especially true for complex systems
-      \item ``Fighting with the Rust borrow-checker''
-      \item ``I'm experienced enough to write safe C/C++''
+      \item<3-> This is especially true for complex systems
+      \item<3-> ``Fighting with the Rust borrow-checker''
+      \item<3-> ``I'm experienced enough to write safe C/C++''
     \end{itemize}
-    \item<3-> Where does Idris fit in here?
+    \item<4-> Where does Idris fit in here?
       \begin{itemize}
-        \item<4-> Allows us to target all areas of the spectrum
-        \item<5-> Compiler and type-system assist you rather than hinder
-        \item<6-> Verify as you go along, tuning the strictness as necessary
-        \item<7-> Unit tests are not thorough enough, so QuickCheck seems like a
+        \item<5-> Allows us to target all areas of the spectrum
+        \item<6-> Compiler and type-system assist you rather than hinder
+        \item<7-> Verify as you go along, tuning the strictness as necessary
+        \item<8-> Unit tests are not thorough enough, so QuickCheck seems like a
                   good middle ground
-        \item<8-> Dependent types allow us to run the tests at compile time, and
-                  linearity to erase their results at runtime
+        \item<9-> Dependent types allow us to run the tests at compile time, and
+                  linearity to erase their results at runtime!
       \end{itemize}
   \end{itemize}
 
@@ -453,21 +459,22 @@ loopProg = do
   \frametitle{How do you generate a dependent type?}
 
   \begin{itemize}
-    \item QuickCheck's bread and butter is \texttt{Arbitrary}
+    \item<1-> QuickCheck's bread and butter is \texttt{Arbitrary}
     \begin{itemize}
-      \item Define how to generate an instance of a type, given some
+      \item<2-> Define how to generate an instance of a type, given some
             pseudorandom number generator state
-      \item Reasonably straightforward for random numbers, picking an element,
-            and structures where the type of the constructors are known at
-            generation-time
+      \item<3-> Reasonably straightforward for random numbers, picking an
+                element, and structures where the type of the constructors are
+                known at generation-time
     \end{itemize}
-    \item However, our types are \textit{dependent}
-    \item So we cannot know the exact type at generation time
+    \item<3-> However, our types are \textit{dependent}
+    \item<4-> So we cannot know the exact type at generation time
     \begin{itemize}
-      \item We can know \textit{a} type, but not all. For example, \texttt{Vect
-            3 Nat} is trivial: \texttt{[!arbitrary, !arbitrary, !arbitrary]}
-      \item The problem is \texttt{Vect n Nat}
-      \item Or even \texttt{Arbitrary t $=>$ Vect n t}
+      \item<5-> We can know \textit{a} type, but not all. For example,
+                \texttt{Vect 3 Nat} is trivial: \texttt{[!arbitrary, !arbitrary,
+                !arbitrary]}
+      \item<6-> The problem is \texttt{Vect n Nat}
+      \item<7-> Or even \texttt{Arbitrary t $=>$ Vect n t}
     \end{itemize}
   \end{itemize}
 
@@ -478,11 +485,11 @@ loopProg = do
   \frametitle{Arbitrary dependent types}
 
   \begin{itemize}
-    \item The solution is more dependent types!
-    \item Specifically: dependent pairs
+    \item<1-> The solution is more dependent types!
+    \item<2-> Specifically: dependent pairs
 
     \vspace*{-6mm}
-    \begin{idrislisting}
+    \begin{idrislisting}<2->
 record DPair a (p : a -> Type) where
   constructor MkDPair
   fst : a
@@ -490,12 +497,12 @@ record DPair a (p : a -> Type) where
     \end{idrislisting}
     \vspace*{-3mm}
 
-    \item As long as we know how to generate an {\textasciigrave
-          \texttt{Arbitrary a}\textasciigrave}, we can generate an
-          {\textasciigrave\texttt{Arbitrary (x : a ** p x)}\textasciigrave}
+    \item<3-> As long as we know how to generate an {\textasciigrave
+              \texttt{Arbitrary a}\textasciigrave}, we can generate an
+              {\textasciigrave\texttt{Arbitrary (x : a ** p x)}\textasciigrave}
     \begin{itemize}
-      \item (The \texttt{**} syntax is sugar for \texttt{DPair}/\texttt{MkDPair}
-            depending on the context)
+      \item<3-> (The \texttt{**} syntax is sugar for
+                \texttt{DPair}/\texttt{MkDPair} depending on the context)
     \end{itemize}
   \end{itemize}
 
@@ -503,6 +510,7 @@ record DPair a (p : a -> Type) where
 
 
 %% FIXME: include this?
+%%
 %% \begin{frame}[fragile]
 %%   \frametitle{Arbitrary vectors}
 %% 
@@ -557,18 +565,18 @@ record DPair a (p : a -> Type) where
   \frametitle{Properties of the ATM}
 
   \begin{itemize}
-    \item As you can see, generating arbitrary ATM steps is a bit more involved
-          than non-dependent types, but it is doable
-    \item And now that we have that, we can specify properties like\\
-          ``Within 5 state-transitions, we should be back in
-          {\textasciigrave\texttt{Ready}\textasciigrave}''
-          \vspace*{-5mm}
-          \idrisinput{qc-things/ATM-props.idr}
-          \vspace*{-2mm}
-    \item \textit{And} we can test it at compile-time
-          \vspace*{-5mm}
-          \idrisinput{qc-things/ATM-qc-props.idr}
-          \vspace*{-2mm}
+    \item<1-> As you can see, generating arbitrary ATM steps is a bit more
+              involved than non-dependent types, but it is doable
+    \item<2-> And now that we have that, we can specify properties like\\
+              ``Within 5 state-transitions, we should be back in
+              {\textasciigrave\texttt{Ready}\textasciigrave}''
+              \vspace*{-5mm}
+              \idrisinput{qc-things/ATM-props.idr}
+              \vspace*{-2mm}
+    \item<3-> \textit{And} we can test it at compile-time
+              \vspace*{-5mm}
+              \idrisinput{qc-things/ATM-qc-props.idr}
+              \vspace*{-2mm}
   \end{itemize}
 
 \end{frame}
