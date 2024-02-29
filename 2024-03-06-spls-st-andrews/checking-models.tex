@@ -176,18 +176,18 @@ data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
     {\color{red} Rejected by the type-checker:}
     \vspace*{-3mm}
     \begin{idrislisting}[basicstyle=\ttfamily\scriptsize]
-badProg : CMD ()
+badProg : ATM ()
             Ready (const Ready)
 badProg = do
-  InsertCard
+  Op Insert
   let pin = 1234
-  Correct <- CheckPIN pin
+  Correct <- Op $ CheckPIN pin
     | Incorrect => InsertCard
-  amt <- GetAmount
-  Dispense amt 
-  -- We never EjectCard,
-  -- so we never come back
-  -- to `Ready'
+  amt <- Op GetAmount
+  Op $ Dispense amt 
+  -- We never Eject, so we
+  -- never come back to
+  -- `Ready'
     \end{idrislisting}
   \end{column}
 
@@ -203,17 +203,17 @@ badProg = do
 loopProg : CMD ()
             Ready (const Ready)
 loopProg = do
-    InsertCard
+    Op InsertCard
     let pin = 4321
     loopIncorrect pin
   where
-    loopIncorrect : Nat -> CMD ()
+    loopIncorrect : Nat -> ATM ()
                       CardInserted
                       (const Ready)
-    loopIncorrect pin = do
-      Incorrect <- CheckPIN pin
+    loopIncorrect p = do
+      Incorrect <- Op $ CheckPIN p
         | Correct => <...>
-      loopIncorrect pin
+      loopIncorrect p
     \end{idrislisting}
     \vspace*{-6mm}
   \end{column}
@@ -230,8 +230,9 @@ loopProg = do
       \item<2-> Not to be permanently unavailable if we retry forever
     \end{itemize}
     \item<3-> However, the programmer is unlikely to catch this
-    \item<4-> The FSM looks correct and rigorous, after all
-    \item<5-> And programming with it will catch most errors
+    \item<4-> The model looks correct and rigorous, after all
+    \item<5-> Programming with it will catch most errors
+    \item<6-> And the type-checker is happy with our sequence of operations
   \end{itemize}
 \end{frame}
 

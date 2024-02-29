@@ -4,16 +4,15 @@ data CheckPINRes  =  Incorrect | Correct
 
 data ATMOp : (ty : Type) -> ATMSt -> (ty -> ATMSt) -> Type
   where
-  InsertCard : ATMOp () Ready (const CardInserted)
-  Dispense   :  (amt : Nat)
-             -> ATMOp () Session (const Session)
+  Insert : ATMOp () Ready (const CardInserted)
 
-  CheckPIN   : Nat
-             -> ATMOp CheckPINRes CardInserted
+  CheckPIN : (pin : Nat)
+           -> ATMOp CheckPINRes CardInserted
                     (\case Incorrect => CardInserted
                            Correct => Session)
 
   GetAmount  : ATMOp Nat state (const state)
-
-  EjectCard  : ATMOp () state (const Ready)
+  Dispense :  (amt : Nat)
+           -> ATMOp () Session (const Session)
+  Eject  : ATMOp () state (const Ready)
 
