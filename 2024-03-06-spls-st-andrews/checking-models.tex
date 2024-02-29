@@ -28,9 +28,9 @@
 %\usetheme{Flip}
 \usetheme{metropolis}
 
-\title{Confidence in Types}
-%% TODO: find better subtitle
-\subtitle{Uniting the Spectrum of Verification}
+\title{Increasing Confidence in Types}
+%% TODO: subtitle?
+%%\subtitle{Uniting the Spectrum of Verification}
 
 \author{Thomas Ekstr{\" o}m Hansen}
 \date{6\textsuperscript{th} March 2024}
@@ -65,7 +65,7 @@
               modelling without having to ``just get it right''?
     \item<4-> Spoilers: How does QuickCheck fit in with dependent types?
     \item<5-> No panacea, but we can hopefully catch errors faster and have some
-              guarantees that our model behaves as intended.
+              guarantees that our model behaves as intended
   \end{itemize}
 
 \end{frame}
@@ -502,27 +502,53 @@ record DPair a (p : a -> Type) where
 \end{frame}
 
 
+%% FIXME: include this?
+%% \begin{frame}[fragile]
+%%   \frametitle{Arbitrary vectors}
+%% 
+%%   \begin{itemize}
+%%   \item To generate an arbitrary vector, we generate \textit{some} length\dots
+%%   \item \dots\ and then generate that many \textasciigrave
+%%         \texttt{arbitrary}\textasciigrave elements
+%%   \end{itemize}
+%% 
+%%   \vspace*{-5mm}
+%% 
+%%   \begin{idrislisting}
+%% Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
+%%   arbitrary = do
+%%     len <- arbitrary
+%%     pure (len ** nArbitrary len)
+%%   where
+%%     nArbitrary : (n : Nat) -> Gen (Vect n a)
+%%     nArbitrary 0 = []
+%%     nArbitrary (S k) = !arbitrary :: nArbitrary k
+%%   \end{idrislisting}
+%% 
+%% \end{frame}
+
+
 \begin{frame}[fragile]
-  \frametitle{Arbitrary vectors}
+  \frametitle{Plumbing for operations}
 
-  \begin{itemize}
-  \item To generate an arbitrary vector, we generate \textit{some} length\dots
-  \item \dots\ and then generate that many \textasciigrave
-        \texttt{arbitrary}\textasciigrave elements
-  \end{itemize}
+  \idrisinput{qc-things/ATM-opres.idr}
 
-  \vspace*{-5mm}
+\end{frame}
 
-  \begin{idrislisting}
-Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
-  arbitrary = do
-    len <- arbitrary
-    pure (len ** nArbitrary len)
-  where
-    nArbitrary : (n : Nat) -> Gen (Vect n a)
-    nArbitrary 0 = []
-    nArbitrary (S k) = !arbitrary :: nArbitrary k
-  \end{idrislisting}
+
+\begin{frame}[fragile]
+  \frametitle{Tracing ATMs}
+
+  \idrisinput{qc-things/ATM-tracing.idr}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Generating arbitrary OpRes}
+
+  \vspace*{-2mm}
+  \idrisinput{qc-things/ATM-arb-opres.idr}
 
 \end{frame}
 
@@ -531,19 +557,44 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
   \frametitle{Properties of the ATM}
 
   \begin{itemize}
-    \item Generating arbitrary ATM steps is a bit more involved, but doable
-          \todo{details of this rather than Vect?}
-    \item Once we have that, we can specify properties like\\
-          ``Within 5 states, we should have returned to \texttt{Ready}''
+    \item As you can see, generating arbitrary ATM steps is a bit more involved
+          than non-dependent types, but it is doable
+    \item And now that we have that, we can specify properties like\\
+          ``Within 5 state-transitions, we should be back in
+          {\textasciigrave\texttt{Ready}\textasciigrave}''
+          \vspace*{-5mm}
+          \idrisinput{qc-things/ATM-props.idr}
+          \vspace*{-2mm}
+    \item \textit{And} we can test it at compile-time
+          \vspace*{-5mm}
+          \idrisinput{qc-things/ATM-qc-props.idr}
+          \vspace*{-2mm}
   \end{itemize}
 
-  \todo{Show it failing}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{QuickCheck spots the error!}
+
+  \begin{itemize}
+    \item<1-> If we try to type-check the file we get:
+              \vspace*{-5mm}
+              \idrisinput{qc-things/ATM-qc-error.idr}
+    \item<2-> And if we investigate by running QC at the REPL, the error is
+              exactly the fault in the model:
+              \vspace*{-5mm}
+              \idrisinput{qc-things/qc-trace-4.idr}
+              \vspace*{-2mm}
+  \end{itemize}
 
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Benefits of a multifaceted approach}
+
+  \todo{Ideally have a fixed version before this}
 
   \begin{enumerate}
     \item<1-> Adaptability {\textemdash} right tool for the job
