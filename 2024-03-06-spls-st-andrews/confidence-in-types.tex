@@ -456,7 +456,7 @@ loopProg = do
         \item<8-> Unit tests are not thorough enough, so QuickCheck seems like a
                   good middle ground
         \item<9-> Dependent types allow us to run the tests at compile time, and
-                  linearity to erase their results at runtime!
+                  quantities to erase their results at runtime!
       \end{itemize}
   \end{itemize}
 
@@ -642,7 +642,7 @@ record DPair a (p : a -> Type) where
               successfully, the REPL reports
               \begin{minted}[fontsize=\scriptsize]{Idris}
 > QuickCheck PROP_eventuallyReady
-MkQCRes (Just True) <log> "OK: 100 tests passed"
+MkQCRes (Just True) <log> "OK, passed 100 tests"
               \end{minted}
   \end{itemize}
 
