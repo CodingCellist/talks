@@ -5,6 +5,9 @@
   - A very broad overview of my research idea
 * [2023 PhD Seminar to peers and staff](/2023-11-10-phd-seminar)
   - Detailing what I had spent the past 3 years on
+* [2024 Scottish Programming Languages Seminar](/2024-03-06-spls-st-andrews)
+  - Motivation and preliminary results of my PhD, presented to peers and experts
+      in the field
 
 # LICENSE
 [![Creative Commons License](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-sa/4.0/)
