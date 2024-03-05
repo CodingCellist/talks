@@ -11,7 +11,7 @@ data ATMOp : (ty : Type) -> ATMSt -> (ty -> ATMSt) -> Type
                     (\case Incorrect => CardInserted
                            Correct => Session)
 
-  GetAmount  : ATMOp Nat state (const state)
+  GetAmount  : ATMOp Nat Session (const Session)
   Dispense :  (amt : Nat)
            -> ATMOp () Session (const Session)
   Eject  : ATMOp () state (const Ready)

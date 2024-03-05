@@ -71,8 +71,8 @@
     \item<3-> How can we spot this? Can we increase confidence in our type-level
               modelling without having to ``just get it right''?
     \item<4-> Spoilers: How does QuickCheck fit in with dependent types?
-    \item<5-> No silver bullet, but we can hopefully catch errors faster and
-              have some guarantees that our model behaves as intended
+    \item<5-> Not a proof technique, but hopefully catches errors faster and
+              provides guarantees that our model behaves as intended
   \end{itemize}
 
 \end{frame}
@@ -105,12 +105,14 @@
             node [left, midway] {Eject} ;
 
       % Lööps %
-      \draw [->] (st-card) to[loop above]
-            node [right, xshift=3mm, yshift=-5mm] {\footnotesize GetPIN!(PIN)}
-            () ;
+%%      \draw [->] (st-card) to[loop above]
+%%            node [right, xshift=3mm, yshift=-5mm] {\footnotesize GetPIN!(PIN)}
+%%            () ;
       \draw [->] (st-card) to[loop right]
             node [below, xshift=3mm, yshift=-3mm] {\scriptsize CheckPIN?(Incorrect)}
             () ;
+      \draw [->] (st-session) to[loop below]
+            node [right, xshift=2mm, yshift=4mm] {\footnotesize GetAmount!(Amt)} () ;
       \draw [->] (st-session) to[loop left]
             node [below, xshift=2mm, yshift=-2mm] {\footnotesize Dispense} () ;
     \end{tikzpicture}
@@ -216,8 +218,8 @@ badProg = do
     {\color{orange} Accepted by the type-checker:}
     \vspace*{1mm}
     \begin{minted}[fontsize=\footnotesize]{Idris}
-loopProg : CMD ()
-            Ready (const Ready)
+loopProg : ATM ()
+             Ready (const Ready)
 loopProg = do
     Op InsertCard
     let pin = 4321
@@ -445,18 +447,19 @@ loopProg = do
               people are unlikely to use it
     \begin{itemize}
       \item<3-> This is especially true for complex systems
-      \item<3-> ``Fighting with the Rust borrow-checker''
-      \item<3-> ``I'm experienced enough to write safe C/C++''
+      \item<4-> ``Fighting with the Rust borrow-checker''
+      \item<5-> ``I'm experienced enough to write safe C/C++''
     \end{itemize}
-    \item<4-> Where does Idris fit in here?
+    \item<6-> Where does Idris fit in here?
       \begin{itemize}
-        \item<5-> Allows us to target all areas of the spectrum
-        \item<6-> Compiler and type-system assist you rather than hinder
-        \item<7-> Verify as you go along, tuning the strictness as necessary
-        \item<8-> Unit tests are not thorough enough, so QuickCheck seems like a
-                  good middle ground
-        \item<9-> Dependent types allow us to run the tests at compile time, and
-                  quantities to erase their results at runtime!
+        \item<7-> General-purpose with dependent types, allowing us to program
+                  to different areas of the spectrum
+        \item<8-> Compiler and type-system assist you rather than hinder
+        \item<9-> Verify as you go along, tuning the strictness as necessary
+        \item<10-> Unit tests are not thorough enough, so QuickCheck seems like
+                   a good middle ground
+        \item<11-> Dependent types allow us to run the tests at compile time,
+                   and quantities to erase their results at runtime!
       \end{itemize}
   \end{itemize}
 
@@ -474,17 +477,17 @@ loopProg = do
       \item<2-> Define how to generate an instance of a type, given some
             pseudorandom number generator state
       \item<3-> Reasonably straightforward for random numbers, picking an
-                element, and structures where the type of the constructors are
+                element, or structures where the type of the constructors are
                 known at generation-time
     \end{itemize}
-    \item<3-> However, our types are \textit{dependent}
-    \item<4-> So we cannot know the exact type at generation time
+    \item<4-> However, our types are \textit{dependent}
+    \item<5-> So we cannot know the exact type at generation time
     \begin{itemize}
-      \item<5-> We can know \textit{a} type, but not all. For example,
+      \item<6-> We can know \textit{a} type, but not all. For example,
                 \mintinline{Idris}{Vect 3 Nat} is trivial:
                 \mintinline{Idris}{[!arbitrary, !arbitrary, !arbitrary]}
-      \item<6-> The problem is\hspace*{2mm} \mintinline{Idris}{Vect n Nat}
-      \item<7-> Or even\hspace*{2mm} \mintinline{Idris}{Arbitrary t => Vect n t}
+      \item<7-> The problem is\hspace*{2mm} \mintinline{Idris}{Vect n Nat}
+      \item<8-> Or even\hspace*{2mm} \mintinline{Idris}{Vect n t}
     \end{itemize}
   \end{itemize}
 
@@ -508,8 +511,9 @@ record DPair a (p : a -> Type) where
     %\vspace*{-1mm}
 
     \item<3-> As long as we know how to generate an {\textasciigrave
-              \mintinline{Idris}{Arbitrary a}\textasciigrave}, we can generate an
-              {\textasciigrave\mintinline{Idris}{Arbitrary (x : a ** p x)}\textasciigrave}
+              \mintinline{Idris}{Arbitrary a}\textasciigrave}, we can generate
+              an {\textasciigrave
+              \mintinline{Idris}{Arbitrary (x : a ** p x)}\textasciigrave}
     \begin{itemize}
       \item<3-> (The \mintinline{Idris}{**} syntax is sugar for
                 \mintinline{Idris}{DPair} / \mintinline{Idris}{MkDPair}
@@ -520,31 +524,33 @@ record DPair a (p : a -> Type) where
 \end{frame}
 
 
-%% FIXME: include this?
-%%
-%% \begin{frame}[fragile]
-%%   \frametitle{Arbitrary vectors}
-%% 
-%%   \begin{itemize}
-%%   \item To generate an arbitrary vector, we generate \textit{some} length\dots
-%%   \item \dots\ and then generate that many \textasciigrave
-%%         \mintinline{Idris}{arbitrary}\textasciigrave elements
-%%   \end{itemize}
-%% 
-%%   \vspace*{-5mm}
-%% 
-%%   \begin{minted}{Idris}
-%% Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
-%%   arbitrary = do
-%%     len <- arbitrary
-%%     pure (len ** nArbitrary len)
-%%   where
-%%     nArbitrary : (n : Nat) -> Gen (Vect n a)
-%%     nArbitrary 0 = []
-%%     nArbitrary (S k) = !arbitrary :: nArbitrary k
-%%   \end{minted}
-%% 
-%% \end{frame}
+\begin{frame}[fragile]
+  \frametitle{Arbitrary vectors}
+
+  \begin{itemize}
+  \item<1-> To generate an arbitrary vector, we generate \textit{some}
+            length\dots
+  \item<2-> \dots\ and then generate that many \mintinline{Idris}{arbitrary}
+            elements
+  \end{itemize}
+
+  \pause
+
+  \begin{minted}{Idris}
+Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
+  arbitrary = do
+    len <- arbitrary
+    vect <- nArbitrary len
+    pure (len ** vect)
+  where
+    nArbitrary : (n : Nat) -> Gen (Vect n a)
+    nArbitrary 0 = []
+    nArbitrary (S k) = !arbitrary :: nArbitrary k
+  \end{minted}
+
+  \vspace*{-5mm}
+
+\end{frame}
 
 
 \begin{frame}[fragile]
@@ -708,10 +714,9 @@ MkQCRes (Just True) <log> "OK, passed 100 tests"
 
 
 \begin{frame}
-  \frametitle{Questions}
 
   \begin{center}
-    \textcolor<1>{orange}{\Large Questions?}
+    \textcolor<1>{staDarkGreen}{\Large Thank you}
   \end{center}
 
 \end{frame}

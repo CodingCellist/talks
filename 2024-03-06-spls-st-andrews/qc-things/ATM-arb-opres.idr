@@ -17,4 +17,4 @@ where
     arbAmount <- arbitrary
     let op1 = (_ ** _ ** MkOpRes (Dispense arbAmount) () %search)
     let op2 = (_ ** _ ** MkOpRes Eject () %search)
-    oneof $ map pure [op1, op2]
+    oneof [pure op1, pure op2]
