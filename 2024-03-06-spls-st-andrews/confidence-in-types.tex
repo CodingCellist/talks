@@ -55,25 +55,35 @@
 \maketitle
 
 
+% TODO: split this into multiple slides; one message per slide
 \begin{frame}
   \frametitle{Overview}
 
   \begin{itemize}
     \item<1-> Many systems exhibit Finite State Machine (FSM)-like behaviour
+    \item<2-> These can be modelled using dependent types
     \begin{itemize}
-      \item<1-> These can be neatly modelled with Dependent Types
+      \item<2-> How do we know the model's behaviour is correct?
     \end{itemize}
-    \item<2-> ATM example of this from Edwin Brady's ``Type Driven
-              Development with Idris'' book
-    \begin{itemize}
-      \item<2-> Turns out this example is subtly incorrect
-    \end{itemize}
-    \item<3-> How can we spot this? Can we increase confidence in our type-level
-              modelling without having to ``just get it right''?
-    \item<4-> Spoilers: How does QuickCheck fit in with dependent types?
-    \item<5-> Not a proof technique, but hopefully catches errors faster and
-              provides guarantees that our model behaves as intended
+    \item<3-> How does QuickCheck fit in with dependent types?
   \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Disclaimer}
+
+  \begin{center}
+    {\large
+    This is not a proof technique
+    }
+
+    {\normalsize
+    But hopefully, it helps us catch errors faster and provides guarantees that
+    our model behaves as intended
+    }
+  \end{center}
 
 \end{frame}
 
@@ -162,26 +172,21 @@ data ATM : (t : Type) -> ATMSt -> (t -> ATMSt) -> Type
 
   \begin{itemize}
     \item<1-> We declare our intended start and end state in the type
+              \begin{minted}{Idris}
+prog : ATM () Ready (const Ready)
+              \end{minted}
     \item<2-> And the type-checker verifies that we don't use commands
               incorrectly
+              \begin{minted}{Idris}
+prog = do                         -- We start in Ready
+  Op Insert  ----------------------- Ready to CardInserted
+  Correct <- Op $ CheckPIN 1234  --- CI to Session
+    | Incorrect => <...>  ---------- (or stay in CI)
+  amount <- Op GetAmount  ---------- Stay in Session
+  Op $ Dispense amount  ------------ Stay in Session
+  Op Eject  ------------------------ Return to Ready
+              \end{minted}
   \end{itemize}
-
-  \pause
-
-  \begin{center}
-  \begin{minipage}{0.9\textwidth}
-  \begin{minted}{Idris}
-  prog : ATM () Ready (const Ready)
-  prog = do
-    Op Insert
-    Correct <- Op $ CheckPIN 1234
-      | Incorrect => <...>
-    amount <- Op GetAmount
-    Op $ Dispense amount
-    Op Eject
-  \end{minted}
-  \end{minipage}
-  \end{center}
 
 \end{frame}
 
@@ -445,49 +450,61 @@ loopProg = do
     \item<1-> All verification systems face the same problem: ergonomics
     \item<2-> If the system is obstructive, or even just perceived as such,
               people are unlikely to use it
+    \item<3-> This is especially true for complex systems
     \begin{itemize}
-      \item<3-> This is especially true for complex systems
       \item<4-> ``Fighting with the Rust borrow-checker''
       \item<5-> ``I'm experienced enough to write safe C/C++''
+      \item<6-> ``I'm experienced enough to get the types right''
     \end{itemize}
-    \item<6-> Where does Idris fit in here?
-      \begin{itemize}
-        \item<7-> General-purpose with dependent types, allowing us to program
-                  to different areas of the spectrum
-        \item<8-> Compiler and type-system assist you rather than hinder
-        \item<9-> Verify as you go along, tuning the strictness as necessary
-        \item<10-> Unit tests are not thorough enough, so QuickCheck seems like
-                   a good middle ground
-        \item<11-> Dependent types allow us to run the tests at compile time,
-                   and quantities to erase their results at runtime!
-      \end{itemize}
   \end{itemize}
-
-  \vspace*{-5mm}
 
 \end{frame}
 
 
 \begin{frame}
-  \frametitle{How do you generate a dependent type?}
+  \frametitle{Where does Idris fit in?}
+
+  \begin{itemize}
+    \item<1-> General-purpose with dependent types, allowing us to program
+              to different areas of the spectrum
+    \item<2-> Compiler and type-system assist rather than hinder
+    \item<3-> Verify as you go along, tuning the strictness as necessary
+    \item<4-> Unit tests are not thorough enough, so QuickCheck seems like
+              a good middle ground
+    \item<5-> Dependent types allow us to run the tests at compile time,
+              and quantities to erase their results at runtime!
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{How do you generate a type?}
 
   \begin{itemize}
     \item<1-> QuickCheck's bread and butter is \mintinline{Idris}{Arbitrary}
+    \item<2-> Define how to generate an instance of a type, given some
+              pseudorandom number generator state
+    \item<3-> We know how to do this for random numbers, picking an element, or
+              structures where the type of the constructors are known at
+              generation-time
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{How do you generate a \emph{dependent} type?}
+
+  \begin{itemize}
+    \item<1-> Our types can depend on values
+    \item<2-> So we cannot know the exact type at generation time
+    \item<3-> We can know \textit{a} type, but not all. For example,
+              \mintinline{Idris}{Vect 3 Nat} is trivial:
+              \mintinline{Idris}{[!arbitrary, !arbitrary, !arbitrary]}
     \begin{itemize}
-      \item<2-> Define how to generate an instance of a type, given some
-            pseudorandom number generator state
-      \item<3-> Reasonably straightforward for random numbers, picking an
-                element, or structures where the type of the constructors are
-                known at generation-time
-    \end{itemize}
-    \item<4-> However, our types are \textit{dependent}
-    \item<5-> So we cannot know the exact type at generation time
-    \begin{itemize}
-      \item<6-> We can know \textit{a} type, but not all. For example,
-                \mintinline{Idris}{Vect 3 Nat} is trivial:
-                \mintinline{Idris}{[!arbitrary, !arbitrary, !arbitrary]}
-      \item<7-> The problem is\hspace*{2mm} \mintinline{Idris}{Vect n Nat}
-      \item<8-> Or even\hspace*{2mm} \mintinline{Idris}{Vect n t}
+      \item<4-> The problem is\hspace*{2mm} \mintinline{Idris}{Vect n Nat}
+      \item<5-> Or even\hspace*{2mm} \mintinline{Idris}{Vect n t}
     \end{itemize}
   \end{itemize}
 
@@ -528,27 +545,37 @@ record DPair a (p : a -> Type) where
   \frametitle{Arbitrary vectors}
 
   \begin{itemize}
-  \item<1-> To generate an arbitrary vector, we generate \textit{some}
-            length\dots
-  \item<2-> \dots\ and then generate that many \mintinline{Idris}{arbitrary}
-            elements
-  \end{itemize}
-
-  \pause
-
-  \begin{minted}{Idris}
+  \item<1-> Provided we know how to generate the elements, we generate
+            \textit{some} length
+            \begin{minted}{Idris}
 Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
   arbitrary = do
     len <- arbitrary
+            \end{minted}
+  \item<2-> And then generate that many \mintinline{Idris}{arbitrary}
+            elements
+            \begin{minted}{Idris}
     vect <- nArbitrary len
     pure (len ** vect)
   where
     nArbitrary : (n : Nat) -> Gen (Vect n a)
     nArbitrary 0 = []
     nArbitrary (S k) = !arbitrary :: nArbitrary k
-  \end{minted}
-
+            \end{minted}
   \vspace*{-5mm}
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Arbitrary ATMs?}
+
+  \begin{itemize}
+    \item<1-> Can we do a similar thing for \mintinline{Idris}{ATMOp} and
+              \mintinline{Idris}{ATM}?
+    \item<2-> Yes, but we need some (dependent) plumbing first
+  \end{itemize}
 
 \end{frame}
 
@@ -569,11 +596,76 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
 \end{frame}
 
 
-\begin{frame}[fragile]
-  \frametitle{Generating arbitrary OpRes}
+%%\begin{frame}[fragile]
+%%  \frametitle{Generating arbitrary OpRes}
+%%
+%%  %\vspace*{-2mm}
+%%  \inputminted[fontsize=\scriptsize]{Idris}{qc-things/ATM-arb-opres.idr}
+%%
+%%\end{frame}
 
-  %\vspace*{-2mm}
-  \inputminted[fontsize=\scriptsize]{Idris}{qc-things/ATM-arb-opres.idr}
+
+\begin{frame}[fragile]
+  \frametitle{Arbitrary OpRes: Prerequisites}
+
+  Provided we know what state we are currently in, we can generate an operation
+  and its result:
+
+  \begin{minted}{Idris}
+{currSt : ATMState} ->
+Arbitrary (resT : _ ** nsFn : resT -> ATMState **
+           OpRes resT currSt nsFn)
+where
+          \end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Arbitrary OpRes: from Ready}
+
+  From \mintinline{Idris}{Ready}, we can insert the card:
+
+  \begin{minted}{Idris}
+  arbitrary {currSt=Ready} =
+    pure (_ ** _ ** MkOpRes Insert () %search)
+  \end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Arbitrary OpRes: from CardInserted}
+
+  Using a dummy value for the PIN, we can control the frequencies of the getting
+  the PIN right:
+
+  \begin{minted}[fontsize=\footnotesize]{Idris}
+arbitrary {currSt=CardInserted} = do
+  -- we need a PIN, even though we control the result
+  let arbPIN = 0
+  let op1 = (_ ** _ ** MkOpRes (CheckPIN arbPIN) Correct %search)
+  let op2 = (_ ** _ ** MkOpRes (CheckPIN arbPIN) Incorrect %search)
+  let op3 = (_ ** _ ** MkOpRes Eject () %search)
+
+  frequency $ [(1, pure op1), (4, pure op2), (1, pure op3)]
+  \end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Arbitrary OpRes: from Session}
+
+  Generate an arbitrary amount to dispense, or eject the card:
+
+  \begin{minted}{Idris}
+arbitrary {currSt=Session} = do
+  arbAmount <- arbitrary
+  let op1 = (_ ** _ ** MkOpRes (Dispense arbAmount) () %search)
+  let op2 = (_ ** _ ** MkOpRes Eject () %search)
+  oneof [pure op1, pure op2]
+  \end{minted}
 
 \end{frame}
 
@@ -582,14 +674,12 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
   \frametitle{Properties of the ATM}
 
   \begin{itemize}
-    \item<1-> As you can see, generating arbitrary ATM steps is a bit more
-              involved than non-dependent types, but it is doable
-    \item<2-> And now that we have that, we can specify properties like\\
+    \item<1-> Now that we have that, we can specify properties like\\
               ``Within 5 state-transitions, we should be back in
               \mintinline{Idris}{Ready}''
               \vspace*{-1mm}
               \inputminted{Idris}{qc-things/ATM-props.idr}
-    \item<3-> \textit{And} we can test it at compile-time
+    \item<2-> \textit{And} we can test it at compile-time
               \vspace*{-1mm}
               \inputminted{Idris}{qc-things/ATM-qc-props.idr}
               \vspace*{-3mm}
@@ -599,8 +689,7 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
 
 
 \begin{frame}[fragile]
-  \frametitle{Model, verification, and implementation all-in-one}
-
+  \frametitle{Model, verification, and implementation}
   \begin{itemize}
     \item<1-> With most verification tools, we have to translate between models
     \begin{itemize}
@@ -611,11 +700,18 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
       \item<2-> Might think we're verifying the same thing, when in actual fact
                 the semantics have changed between representations
     \end{itemize}
-    \item<3-> In our case, the specification \textit{is} the model;
-              \textit{everywhere}
-              \vspace*{1mm}
-              \inputminted[fontsize=\footnotesize]{Idris}{qc-things/ATM-arb-trace.idr}
   \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{All in one}
+
+  
+  In our case, the specification \textit{is} the model; \textit{everywhere}
+
+  \inputminted[fontsize=\footnotesize]{Idris}{qc-things/ATM-arb-trace.idr}
 
 \end{frame}
 
@@ -673,7 +769,7 @@ MkQCRes (Just True) <log> "OK, passed 100 tests"
         \item<5-> Specification lives alongside model lives alongside
                   implementation
         \item<6-> The implementation is just there; it \emph{is} runnable code
-        \item<7-> Parts can be verified independently \emph{while} combining into an
+        \item<7-> Parts can be verified independently \emph{while} combined into an
                   overall system
       \end{itemize}
   \end{enumerate}
@@ -730,6 +826,8 @@ MkQCRes (Just True) <log> "OK, passed 100 tests"
       \includegraphics[width=0.35\framewidth]{qr-code.png}
       \caption{\href{https://github.com/CodingCellist/talks/tree/main/2024-03-06-spls-st-andrews}{github.com/CodingCellist/talks}}
     \end{figure}
+    {\href{mailto:teh6@st-andrews.ac.uk}{\small teh6@st-andrews.ac.uk}}
+    \vspace*{-10mm}
   \end{center}
 
 \end{frame}

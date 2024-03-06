@@ -5,7 +5,7 @@ where
     pure (_ ** _ ** MkOpRes Insert () %search)
 
   arbitrary {currSt=CardInserted} = do
-    -- we need _a_ PIN, even though we control the result
+    -- we need a PIN, even though we control the result
     let arbPIN = 0
     let op1 = (_ ** _ ** MkOpRes (CheckPIN arbPIN) Correct %search)
     let op2 = (_ ** _ ** MkOpRes (CheckPIN arbPIN) Incorrect %search)
