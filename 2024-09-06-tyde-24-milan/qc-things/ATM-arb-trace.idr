@@ -1,9 +1,6 @@
-trace :  (steps : Nat) -> (currSt : ATMState)
-      -> Gen (Vect steps TraceStep)
+trace : (steps : Nat) -> (st : stT) -> Gen (Vect steps (TraceStep opT))
 trace 0 _ = pure []
-trace (S k) currSt =
-  the (Gen (x ** y ** OpRes x currSt y)) arbitrary
-  >>=
-  \case (_ ** nsFn ** opR@(MkOpRes _ res _)) =>
-     do let nextState = nsFn res  -- ! nsFn from ISM
-        pure $ (MkTS opR nextState) :: !(trace k nextState)
+trace (S j) st = do
+  (_ ** stFn ** opR@(MkOpRes op res)) <- arbitrary
+  let nextSt = stFn res
+  pure $ (MkTS opR nextSt) :: !(trace j nextSt)
