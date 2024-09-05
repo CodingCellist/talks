@@ -1,5 +1,5 @@
-%\documentclass[compress]{beamer}
-\documentclass[compress,handout]{beamer}
+\documentclass[compress]{beamer}
+%\documentclass[compress,handout]{beamer}
 
 %%%%% PREAMBLE %%%%%
 
@@ -37,6 +37,7 @@
 \author{{\bfseries Thomas Ekstr{\" o}m Hansen} \& Edwin Brady}
 \date{TyDe '24 {\textemdash} 9\textsuperscript{th} September 2024}
 
+\definecolor{highl}{HTML}{dafc5f}
 \definecolor{staBlue}{HTML}{00539b}
 \definecolor{staMidGreen}{HTML}{00853f}
 \definecolor{staDarkGreen}{HTML}{005953}
@@ -52,40 +53,22 @@
 \maketitle
 
 
-%% MARK: Overview
-\begin{frame}
-  \frametitle{Overview}
-
-  \begin{itemize}
-    \item<1-> Stateful systems fit nicely with dependently typed models
-    \item<2-> Dependent types are difficult to get right, how do we test them?
-    \item<3-> A general framework for stateful, testable, and dependently typed
-              models
-  \end{itemize}
-
-\end{frame}
-
-
 %% MARK: Motivation
 \begin{frame}
   \frametitle{Motivation}
 
+  \large
+
   \begin{itemize}
-    \item<1-> Many systems exhibit Finite State Machine (FSM)-like behaviour
+    \item<1-> Many systems exhibit Finite-State-Machine-like behaviour
     \item<2-> These can be modelled using dependent types
     \begin{itemize}
-      \item<2-> Dependent types are difficult to get right
+      \item<3-> Dependent types are difficult to get right
     \end{itemize}
-    \item<3-> We want to increase confidence in our types
+    \item<4-> How do we increase confidence in our dependent types?
   \end{itemize}
 
 \end{frame}
-
-
-%% MARK: Approach
-
-
-%% MARK: Contributions
 
 
 %% MARK: Disclaimer
@@ -110,10 +93,12 @@
 \begin{frame}
   \frametitle{Stateful Computer Systems}
 
+  \large
+
   \begin{itemize}
     \item<1-> Stateful systems are ubiquitous
-    \item<2-> Embedded controllers for automatic doors, ATMs, and network
-              protocols
+    \item<2-> Embedded controllers for automatic doors, ATMs, network protocols,
+              etc...
     \item<3-> These are all stateful
     \item<4-> And we would very much like them to be correct
   \end{itemize}
@@ -266,15 +251,51 @@
 
 
 %% MARK: TyDe
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{What about Type-Driven Development?}
 
-  \begin{itemize}
-    \item<1-> Dependently Typed languages like Agda and Idris
-    \item<2-> Can construct advanced types and embedded DSLs
-    \item<3-> And the type checker then helps verify the program
-    \item<4-> Fits somewhere in the middle
-  \end{itemize}
+  \large
+
+  \begin{columns}
+  \begin{column}{0.6\framewidth}
+    \begin{itemize}
+      \item<1-> Dependently typed languages like Agda and Idris
+      \item<2-> Can construct advanced types and embedded DSLs
+      \item<3-> Have the types and type checker guide the implementation and
+                verify its behaviour (correct-by-construction)
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.4\framewidth}
+    \begin{onlyenv}<4->
+    \begin{minted}[gobble=6,fontsize=\normalsize,breaklines=false]{Haskell}
+      head :: [a] -> a
+      -- crashes on
+      -- `head []`
+    \end{minted}
+    \end{onlyenv}
+
+    \vspace*{3mm}
+
+    \begin{onlyenv}<5->
+    \begin{minted}[gobble=6,fontsize=\normalsize,breaklines=false]{Idris}
+      head :  Vect (S k) a
+           -> a
+      -- always safe because
+      -- the length must be
+      -- at least 1
+    \end{minted}
+    \end{onlyenv}
+  \end{column}
+  \end{columns}
+
+  \pause
+
+  \vspace*{2mm}
+  \begin{center}
+    \large
+    Fits somewhere in the middle
+  \end{center}
+  \vspace*{-12mm}
 \end{frame}
 
 
@@ -301,7 +322,7 @@
 
   \begin{columns}
   \begin{column}{0.3\framewidth}
-    \begin{minted}[gobble=6]{Idris}
+    \begin{minted}[gobble=6,fontsize=\normalsize]{Idris}
       data ATMState
         = Ready
         | CardInserted
@@ -326,12 +347,11 @@
 
   \begin{columns}
   \begin{column}{0.3\framewidth}
-    \begin{minted}[gobble=6]{Idris}
+    \begin{minted}[gobble=6,fontsize=\normalsize]{Idris}
       data PINok 
         = Correct
         | Incorrect
     \end{minted}
-    \pause
   \end{column}
 
   \begin{column}{0.65\framewidth}
@@ -345,6 +365,8 @@
   \vspace*{1cm}
 
   \pause
+
+  \large
 
   Everything which does not have a result returns Unit {\textemdash}
   \mintinline{Idris}|()|
@@ -379,16 +401,37 @@
 \begin{frame}[fragile]
   \frametitle{Dependent State Transition}
 
-  \begin{minted}[gobble=4]{Idris}
-    data ATM : (t : Type) -> ATMState -> (t -> ATMState) -> Type where
+  \begin{onlyenv}<1>
+  \begin{minted}[gobble=4,fontsize=\normalsize]{Idris}
+    data ATM : (t : Type) -> ATMState -> (t -> ATMState)
+             -> Type where
       CheckPIN :  (pin : Int)
                -> ATM PINok CardInserted ChkPINfn
   \end{minted}
   \vspace*{-5mm}
   \hspace*{1cm} \vdots
-  \begin{minted}[gobble=4]{Idris}
-      (>>=) : ATM a s1 s2f -> ((x : a) -> ATM b (s2f x) s3f) -> ATM b s1 s3f
+  \begin{minted}[gobble=4,fontsize=\normalsize]{Idris}
+      (>>=) :  ATM a s1 s2f
+            -> ((x : a) -> ATM b (s2f x) s3f)
+            -> ATM b s1 s3f
   \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<2>
+  \begin{minted}[fontsize=\normalsize,escapeinside=||,breaklines=false]{Idris}
+data ATM : |\colorbox{lime}{(t : Type)}| -> ATMState -> |\colorbox{lime}{(t -> ATMState)}|
+        -> Type where
+  CheckPIN :  (pin : Int)
+          -> ATM |\colorbox{lime}{PINok}| CardInserted |\colorbox{lime}{ChkPINfn}|
+  \end{minted}
+  \vspace*{-5mm}
+  \hspace*{1cm} \vdots
+  \begin{minted}[fontsize=\normalsize,escapeinside=||]{Idris}
+  (>>=) :  ATM |\colorbox{lime}{a}| s1 s2f
+        -> (|\colorbox{lime}{(x : a)}| -> ATM b |\colorbox{lime}{(s2f x)}| s3f)
+        -> ATM b s1 s3f
+  \end{minted}
+  \end{onlyenv}
 
 \end{frame}
 
@@ -414,6 +457,8 @@
 \begin{frame}[fragile]
   \frametitle{Why Is This Neat?}
 
+  \large
+
   \begin{itemize}
     \item<1-> We declare our intended start and end state in the type
               \begin{minted}{Idris}
@@ -432,51 +477,6 @@ prog = do                    -- We start in Ready
   \end{itemize}
 
 \end{frame}
-
-
-%%% %% MARK: ISM Definition
-%%% \begin{frame}
-%%%   \frametitle{Model: Indexed State Monads (ISMs)}
-%%% 
-%%%   \begin{itemize}
-%%%     \item<1-> Declare a datatype for the states
-%%%     \item<2-> Declare datatypes for the possible results (if any) of the
-%%%               operations
-%%%     \item<3-> Declare a datatype with constructors for each operation, such
-%%%               that:
-%%%       \begin{itemize}
-%%%         \item<4-> The type checker can follow the state transitions
-%%%         \item<5-> We can program with the operations
-%%%       \end{itemize}
-%%%   \end{itemize}
-%%% 
-%%% \end{frame}
-%%% 
-%%% 
-%%% %% MARK: General ISM
-%%% \begin{frame}[fragile]
-%%%   \frametitle{Generalised ISMs}
-%%% 
-%%%   \begin{itemize}
-%%%     \item<1-> The ISM pattern can be generalised
-%%%     \item<2-> Bind and pure are formulaic, operations are ``just'' semantics
-%%%   \end{itemize}
-%%%   
-%%%   \pause
-%%% 
-%%%   \begin{minted}[gobble=4]{Idris}
-%%%     op : forall st . (t' : Type) -> st -> (t' -> st) -> Type
-%%% 
-%%%     data Prog :  {0 stT : _} -> (opT : (t' : _) -> stT -> (t' -> stT) -> Type) -> ... -> Type where
-%%%       Pure : (x : t) -> Prog opT t (stFn x) stFn
-%%%       Op : {0 opT : (t’ : _) -> stT -> (t’ -> stT) -> Type}
-%%%          -> opT t st stFn -> Prog opT t st stFn
-%%%       (>>=) : Prog opT resT1 st1 stFn1
-%%%             -> ((x : resT1) -> Prog opT resT2 (stFn1 x) stFn2)
-%%%             -> Prog opT resT2 st1 stFn2
-%%%   \end{minted}
-%%% 
-%%% \end{frame}
 
 
 %% MARK: Loop program
@@ -532,91 +532,40 @@ loopProg = do
 \end{frame}
 
 
-%% MARK: Why problem?
-\begin{frame}
-  \frametitle{Why Is This a Problem?}
-
-  \begin{itemize}
-    \item<1-> As-is, the PIN can be brute forced!
-    \item<2-> We expect an ATM to reject the card after 3 PIN attempts
-    \begin{itemize}
-      \item<2-> Not to be permanently unavailable if we retry forever
-    \end{itemize}
-    \item<3-> However, the programmer is unlikely to catch this
-    \item<4-> The model looks correct and rigorous, after all
-    \item<5-> Programming with it will catch most errors
-    \item<6-> And the type-checker is happy with our sequence of operations
-  \end{itemize}
-\end{frame}
-
-
-%% \begin{frame}
-%%   \frametitle{How do we solve this?}
-%% 
-%%   \begin{itemize}
-%%     \item<1-> We could spot the issue when it happens
-%%     \begin{itemize}
-%%       \item<2-> Someone will (hopefully) spot the issue during development
-%%       \item<3-> Or, worst case, spot it when it happens after deployment
-%%     \end{itemize}
-%%     \item<4-> And then we update our model and everything is good
-%%     \item<5-> Why not try to spot it \textit{automatically} before either of
-%%               those?
-%%     \item<6-> Modelling can clearly go wrong, so how do we increase our
-%%               confidence in the models?
-%%   \end{itemize}
-%% \end{frame}
-
-
-%% \begin{frame}
-%%   \frametitle{The eternal problem with verification systems}
-%% 
-%%   \begin{itemize}
-%%     \item<1-> All verification systems face the same problem: ergonomics
-%%     \item<2-> If the system is obstructive, or even just perceived as such,
-%%               people are unlikely to use it
-%%     \item<3-> This is especially true for complex systems
-%%     \begin{itemize}
-%%       \item<4-> ``Fighting with the Rust borrow-checker''
-%%       \item<5-> ``I'm experienced enough to write safe C/C++''
-%%       \item<6-> ``I'm experienced enough to get the types right''
-%%     \end{itemize}
-%%   \end{itemize}
-%% 
-%% \end{frame}
-
-
 %% MARK: PBT recap
 \begin{frame}[fragile]
   \frametitle{Property Based Testing}
 
+  \large
+
   \begin{itemize}
-    \item<1-> QuickCheck is a Property Based Testing (PBT) framework initially
-              developed for Haskell
-    \item<2-> Define how to \emph{generate} an instance of a type, given some
-              pseudorandom number generator state
-      \begin{itemize}
-        \item<2-> This is referred to as \mintinline{Idris}{Arbitrary}
-      \end{itemize}
-    \item<3-> Write \emph{properties} and \emph{generate} their test case inputs
+    \item<1-> Generate instances of types from random numbers
+              \begin{minted}[gobble=16,fontsize=\large]{Idris}
+                data Gen a : (Int -> a) -> Type
+              \end{minted}
+    \item<2-> \begin{minted}[gobble=16,fontsize=\large]{Idris}
+                interface Arbitrary a where
+                  arbitrary : Gen a
+              \end{minted}
+    \item<3-> We express boolean properties, which are then tested over random
+              inputs (typically 100)
+              \begin{minted}[gobble=16,fontsize=\large]{Idris}
+                reverse (reverse xs) == xs
+              \end{minted}
   \end{itemize}
 
 \end{frame}
 
 
-%% MARK: Ty-lvl PBT
-\begin{frame}[fragile]
-  \frametitle{Type-Level Property Based Testing}
+%% MARK: DepTy.s?
+\begin{frame}
+  \frametitle{What About Dependent Types?}
 
-  \begin{itemize}
-    \item<1-> In Idris2, the \mintinline{Idris}|So| type is inhabited iff its
-              argument evaluates to \mintinline{Idris}|True|
-    \item<2-> In other words, we can run property based testing as part of the
-              type checking process!\\
-              \mintinline{Idris}|So (quickCheck <property>)|
-    \item<3-> Idris2 is built on Quantitative Type Theory, which has erasure,
-              meaning the tests are removed from the compiled program
-  \end{itemize}
+  \large
+
+  \begin{center}
+    QuickCheck works very well for regular types, what about dependent types?
+  \end{center}
 
 \end{frame}
 
@@ -625,17 +574,58 @@ loopProg = do
 \begin{frame}[fragile]
   \frametitle{Generating Dependent Types is Tricky}
 
-  \begin{itemize}
-    \item<1-> Consider generating arbitrary vectors:
-              \begin{minted}[gobble=16]{Idris}
-                Arbitrary t => Arbitrary (Vect n t)
-              \end{minted}
-    \item<2-> The type index \mintinline{Idris}|n| is implicit
-    \item<3-> We cannot guarantee that the generated \mintinline{Idris}|Vect|
-              will have some general, unspecified length \mintinline{Idris}|n|
-    \item<4-> We could generate vectors of a specific length, but this is not
-              ideal {\textemdash} an instance for each length
-  \end{itemize}
+  \large
+  
+  Consider generating arbitrary vectors:
+
+  \begin{onlyenv}<1>
+  \begin{minted}[fontsize=\large,gobble=4]{Idris}
+    Arbitrary t => Arbitrary (Vect n t) where
+  \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<2>
+  \begin{minted}[fontsize=\large,gobble=4]{Idris}
+    Arbitrary t => Arbitrary (Vect n t) where
+      arbitrary = do
+        length_ <- arbitrary
+  \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<3>
+  \begin{minted}[fontsize=\large,gobble=4]{Idris}
+    Arbitrary t => Arbitrary (Vect n t) where
+      arbitrary = do
+        length_ <- arbitrary
+        arbVect <- nArbitrary length_
+  \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<4>
+  \begin{minted}[fontsize=\large,gobble=4]{Idris}
+    Arbitrary t => Arbitrary (Vect n t) where
+      arbitrary = do
+        length_ <- arbitrary
+        arbVect <- nArbitrary length_
+        pure arbVect
+  \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<5->
+  \begin{minted}[fontsize=\large,gobble=4,highlightlines=6,highlightcolor=pink]{Idris}
+    Arbitrary t => Arbitrary (Vect n t) where
+      arbitrary = do
+        length_ <- arbitrary
+        arbVect <- nArbitrary length_
+        pure arbVect
+        -- Error: cannot unify length_ with n
+  \end{minted}
+  \end{onlyenv}
+
+  \vspace*{1mm}
+  \begin{center}
+    \only<6->{How do we solve this?}
+  \end{center}
 
 \end{frame}
 
@@ -644,28 +634,27 @@ loopProg = do
 \begin{frame}[fragile]
   \frametitle{Arbitrary Dependent Types}
 
+  \large
+
   \begin{itemize}
     \item<1-> The solution is more dependent types!
     \item<2-> Specifically: dependent pairs
 
     %\vspace*{-1mm}  % <2->
-    \begin{minted}{Idris}
-record DPair a (p : a -> Type) where
-  constructor MkDPair
-  fst : a
-  snd : p fst
+    \begin{minted}[gobble=6,fontsize=\normalsize]{Idris}
+      record DPair a (p : a -> Type) where
+        constructor MkDPair
+        fst : a
+        snd : p fst
     \end{minted}
     %\vspace*{-1mm}
+
+    %% TODO: Split this?
 
     \item<3-> As long as we know how to generate an {\textasciigrave
               \mintinline{Idris}{Arbitrary a}\textasciigrave}, we can generate
               an {\textasciigrave
               \mintinline{Idris}{Arbitrary (x : a ** p x)}\textasciigrave}
-    \begin{itemize}
-      \item<3-> (The \mintinline{Idris}{**} syntax is sugar for
-                \mintinline{Idris}{DPair} / \mintinline{Idris}{MkDPair}
-                depending on the context)
-    \end{itemize}
   \end{itemize}
 
 \end{frame}
@@ -675,26 +664,52 @@ record DPair a (p : a -> Type) where
 \begin{frame}[fragile]
   \frametitle{Arbitrary Vectors}
 
-  \begin{itemize}
-  \item<1-> We know how to generate the elements, so start by generating
-            \textit{some} length
-            \begin{minted}{Idris}
-Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
-  arbitrary = do
-    len <- arbitrary
-            \end{minted}
-  \item<2-> And then generate that many \mintinline{Idris}{arbitrary}
-            elements
-            \begin{minted}{Idris}
-    vect <- nArbitrary len
-    pure (len ** vect)
-  where
-    nArbitrary : (n : Nat) -> Gen (Vect n a)
-    nArbitrary 0 = []
-    nArbitrary (S k) = !arbitrary :: nArbitrary k
-            \end{minted}
-  \vspace*{-5mm}
-  \end{itemize}
+  \large
+
+  When we know the length, we will know the type of the vector
+
+  \begin{onlyenv}<1>
+  \begin{minted}[gobble=4,fontsize=\normalsize]{Idris}
+    Arbitrary (n : Nat ** Vect n a) where
+  \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<2>
+  \begin{minted}[gobble=4,fontsize=\normalsize]{Idris}
+    Arbitrary (n : Nat ** Vect n a) where
+      arbitrary = do
+        length_ <- arbitrary
+  \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<3>
+  \begin{minted}[gobble=4,fontsize=\normalsize]{Idris}
+    Arbitrary (n : Nat ** Vect n a) where
+      arbitrary = do
+        length_ <- arbitrary
+        arbVect <- nArbitrary length_
+  \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<4>
+  \begin{minted}[gobble=4,fontsize=\normalsize]{Idris}
+    Arbitrary (n : Nat ** Vect n a) where
+      arbitrary = do
+        length_ <- arbitrary
+        arbVect <- nArbitrary length_
+        pure (length_ ** arbVect)
+  \end{minted}
+  \end{onlyenv}
+
+  \begin{onlyenv}<5>
+  \begin{minted}[gobble=4,fontsize=\normalsize]{Idris}
+    Arbitrary (n : Nat ** Vect n a) where
+      arbitrary = do
+        length_ <- arbitrary
+        arbVect <- nArbitrary length_
+        pure (_ ** arbVect)
+  \end{minted}
+  \end{onlyenv}
 
 \end{frame}
 
@@ -703,11 +718,15 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
 \begin{frame}[fragile]
   \frametitle{Arbitrary ATMs?}
 
-  \begin{itemize}
-    \item<1-> Can we do a similar thing for \mintinline{Idris}{ATMOp} and
-              \mintinline{Idris}{ATM}?
-    \item<2-> With a bit of work, yes!
-  \end{itemize}
+  \large
+
+  \begin{center}
+    Can we do a similar thing for the \mintinline{Idris}{ATM}?
+
+    \pause
+
+    With a bit of work, yes!
+  \end{center}
 
 \end{frame}
 
@@ -716,102 +735,39 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
 \begin{frame}[fragile]
   \frametitle{A Bit of Work}
 
+  \large
+
   \begin{itemize}
-    \item<1-> Store the operation and its result instance {\textemdash}
-              whether \mintinline{Idris}|PINok| was successful, for example
+    \item<1-> Store the operation and its result instance {\textemdash} for
+              example whether \mintinline{Idris}|PINok| was successful\\
+              \mintinline{Idris}|(<resT> ** <stFn> ** MkOpRes <op> <res : resT> ...)|
     \item<2-> Store an operation-result pair, and the state this moved
-              us to
+              us to\\
+              \mintinline{Idris}|TraceStep (OpRes <stT> ...) <resSt : stT>|
     \item<3-> A chain of these make up a \emph{trace}
   \end{itemize}
 
 \end{frame}
 
 
-%% MARK: Arb Trace
-\begin{frame}
-  \frametitle{Generating Traces}
+%% THESE ARE NOTES
 
-  \begin{itemize}
-    \item<1-> Given the current state, pattern matching allows the type checker
-              to reduce the state function
-    \item<2-> So we know which operations are possible
-    \item<3-> Pick an arbitrary one, apply it, log its results, and repeat the
-              process
-  \end{itemize}
-
-
-\end{frame}
-
-
-%%% %% MARK: OpRes
+%%% %% MARK: Arb Trace
 %%% \begin{frame}[fragile]
-%%%   \frametitle{Recording an Operation Happening}
+%%%   \frametitle{Generating Traces}
 %%% 
-%%%   \begin{minted}[gobble=4]{Idris}
-%%%     record OpRes {0 stT : _} (opT : (t’ : _) -> stT -> (t’ -> stT) -> Type) ... where
-%%%       constructor MkOpRes
-%%%       op : opT resT currSt nsFn
-%%%       res : resT
-%%%       {auto opShow : Show (opT resT currSt nsFn)}
-%%%       {auto rShow : Show resT}
-%%%   \end{minted}
+%%%   \begin{itemize}
+%%%     \item<1-> Given the current state, pattern matching allows the type checker
+%%%               to reduce the state function
+%%%     \item<2-> So we know which operations are possible
+%%%     \begin{itemize}
+%%%       \item<3-> From \mintinline{Idris}|CardInserted|: check the PIN, or eject
+%%%                 the card
+%%%     \end{itemize}
+%%%     \item<4-> Pick an arbitrary one, apply it, store the result and the next
+%%%               state, and repeat the process
+%%%   \end{itemize}
 %%% 
-%%% \end{frame}
-%%% 
-%%% 
-%%% %% MARK: TraceStep
-%%% \begin{frame}[fragile]
-%%%   \frametitle{Tracing a State Transition}
-%%% 
-%%%   \begin{minted}[gobble=4]{Idris}
-%%%     record TraceStep (opT : (t’ : _) -> stT -> (t’ -> stT) -> Type) where
-%%%       constructor MkTS
-%%%       opRes : OpRes opT stepRT stepSt stepFn
-%%%       resSt : stT
-%%%   \end{minted}
-%%% 
-%%% \end{frame}
-%%% 
-%%% 
-%%% %% MARK: Trace
-%%% \begin{frame}[fragile]
-%%%   \frametitle{Tracing Sequences of State Transitions}
-%%% 
-%%%   \begin{minted}[gobble=4]{Idris}
-%%%     data Trace : (opT : (t’ : _) -> stT -> (t’ -> stT) -> Type) -> ... -> Type where
-%%%       MkTrace : Show stT => (initSt : stT) -> {bound : Nat}
-%%%               -> (trace : Vect bound (TraceStep opT))
-%%%               -> Trace opT initSt bound
-%%%   \end{minted}
-%%% 
-%%% \end{frame}
-%%% 
-%%% 
-%%% \begin{frame}[fragile]
-%%%   \frametitle{Arbitrary OpRes: Prerequisites}
-%%% 
-%%%   Provided we know what state we are currently in, we can generate an operation
-%%%   and its result:
-%%% 
-%%%   \begin{minted}{Idris}
-%%% {currSt : ATMState} ->
-%%% Arbitrary (resT : _ ** nsFn : resT -> ATMState **
-%%%            OpRes resT currSt nsFn)
-%%% where
-%%%           \end{minted}
-%%% 
-%%% \end{frame}
-%%% 
-%%% 
-%%% \begin{frame}[fragile]
-%%%   \frametitle{Arbitrary OpRes: from Ready}
-%%% 
-%%%   From \mintinline{Idris}{Ready}, we can insert the card:
-%%% 
-%%%   \begin{minted}{Idris}
-%%%   arbitrary {currSt=Ready} =
-%%%     pure (_ ** _ ** MkOpRes Insert ())
-%%%   \end{minted}
 %%% 
 %%% \end{frame}
 
@@ -819,6 +775,8 @@ Arbitrary a => Arbitrary (n : Nat ** Vect n a) where
 %% MARK: Options CI
 \begin{frame}[fragile]
   \frametitle{ATM: from CardInserted}
+
+  \large
 
   This is still QuickCheck, we can control the frequency of generated instances:
 
@@ -836,43 +794,30 @@ options CardInserted = do
 \end{frame}
 
 
-%%% \begin{frame}[fragile]
-%%%   \frametitle{Arbitrary OpRes: from Session}
-%%% 
-%%%   Generate an arbitrary amount to dispense, or eject the card:
-%%% 
-%%%   \begin{minted}{Idris}
-%%% arbitrary {currSt=Session} = do
-%%%   arbAmount <- arbitrary
-%%%   let op1 = (_ ** _ ** MkOpRes (Dispense arbAmount) ())
-%%%   let op2 = (_ ** _ ** MkOpRes Eject ())
-%%%   oneof [pure op1, pure op2]
-%%%   \end{minted}
-%%% 
-%%% \end{frame}
-%%% 
-%%% 
-%%% \begin{frame}
-%%%   \frametitle{Properties of the ATM}
-%%% 
-%%%   \begin{itemize}
-%%%     \item<1-> Now that we have that, we can specify properties like\\
-%%%               ``Within 5 state-transitions, we should be back in
-%%%               \mintinline{Idris}{Ready}''
-%%%               \vspace*{-1mm}
-%%%               \inputminted{Idris}{qc-things/ATM-props.idr}
-%%%     \item<2-> \textit{And} we can test it at compile-time
-%%%               \vspace*{-1mm}
-%%%               \inputminted{Idris}{qc-things/ATM-qc-props.idr}
-%%%               \vspace*{-3mm}
-%%%   \end{itemize}
-%%% 
-%%% \end{frame}
+%% MARK: Ty-lvl PBT
+\begin{frame}[fragile]
+  \frametitle{Type-Level Property Based Testing}
+
+  \large
+
+  \begin{itemize}
+    \item<1-> In Idris2, the \mintinline{Idris}|So| type is inhabited iff its
+              argument evaluates to \mintinline{Idris}|True|
+    \item<2-> In other words, we can run property based testing as part of the
+              type checking process!\\
+              \mintinline{Idris}|So (quickCheck <property>)|
+    \item<3-> Idris2 is built on Quantitative Type Theory, which has erasure,
+              meaning the tests are removed from the compiled program
+  \end{itemize}
+
+\end{frame}
 
 
 %% MARK: QC ATM error
 \begin{frame}[fragile]
   \frametitle{QuickCheck Spots the Error!}
+
+  \large
 
   \begin{minted}[gobble=4,fontsize=\footnotesize]{Idris}
     0 PROP_eventuallyReady : Fn (ATMTrace Ready 10) Bool
@@ -883,9 +828,11 @@ options CardInserted = do
   \pause
 
   With a property to eventually return to \mintinline{Idris}|Ready|, the file no
-  longer type checks:
+  longer type checks
 
-  \inputminted{Idris}{qc-things/ATM-qc-error.idr}
+  \pause
+
+  \inputminted[fontsize=\normalsize]{Idris}{qc-things/ATM-qc-error.idr}
 
 \end{frame}
 
@@ -894,23 +841,23 @@ options CardInserted = do
 \begin{frame}[fragile]
   \frametitle{QuickCheck Gives a Trace}
 
-  \begin{itemize}
-    \item<1-> Investigating by running QuickCheck at the REPL, the error is
-              exactly the fault in the model:
-              \vspace*{1mm}
-              \inputminted[fontsize=\scriptsize]{Idris}{qc-things/qc-trace-4.idr}
-              \vspace*{-4mm}
-  \end{itemize}
+  \large
+
+  Investigating by running QuickCheck at the REPL, the error is exactly the
+  fault in the model
+
+  \pause
+
+  \inputminted[fontsize=\small]{Idris}{qc-things/qc-trace-4.idr}
 
 \end{frame}
-
-
-%% TODO: Frame on dep ty.s being ty-lvl prog.s
 
 
 %% MARK: Fixing things
 \begin{frame}[fragile]
   \frametitle{Fixing Things}
+
+  \large
 
   \begin{itemize}
     \item<1-> Now that we know there's an error, we can fix things!
@@ -925,25 +872,33 @@ options CardInserted = do
     \item<2-> Carrying this through to the generators, our property passes: the
               file reloads successfully and the REPL reports
               \begin{minted}[gobble=16]{Idris}
-                > QuickCheck PROP_eventuallyReady
+                > quickCheck PROP_eventuallyReady
                 MkQCRes (Just True) <log> "OK, passed 100 tests"
               \end{minted}
   \end{itemize}
+
+  \vspace*{-5mm}
 
 \end{frame}
 
 
 %% MARK: Mod, verif, impl
 \begin{frame}
+
+  \large
+
   \frametitle{Model, Verification, and Implementation}
   \begin{itemize}
-    \item<1-> With most verification tools, we have to translate between models
+    \item<1-> With most verification tools, we have to translate between
+              representations
     \begin{itemize}
       \item<1-> Spec, model, and implementation are independent
     \end{itemize}
     \item<2-> This results in the risk of translation mistakes
     \begin{itemize}
-      \item<2-> Might think we're verifying the same thing, when in actual fact
+      \item<3-> The verification tool might not support the same types as the
+                implementation language
+      \item<4-> Might think we're verifying the same thing, when in actual fact
                 the semantics have changed between representations
     \end{itemize}
   \end{itemize}
@@ -955,15 +910,23 @@ options CardInserted = do
 \begin{frame}[fragile]
   \frametitle{All in one}
 
+  \large
+
   
   In our case, the specification \textit{is} the model; \textit{everywhere}
 
+  \begin{onlyenv}<1>
   \inputminted{Idris}{qc-things/ATM-arb-trace.idr}
+  \end{onlyenv}
 
-  \pause
+  \begin{onlyenv}<2->
+  \inputminted[highlightlines=4-5,highlightcolor=highl]{Idris}{qc-things/ATM-arb-trace.idr}
+  \end{onlyenv}
 
-  And this works for anything expressed in terms of states, results, and
-  operations {\textemdash} ISMs generalise
+  \begin{onlyenv}<3>
+  And this works for anything expressed in terms of states and operations with
+  results {\textemdash} ISMs generalise
+  \end{onlyenv}
 
 \end{frame}
 
@@ -972,91 +935,35 @@ options CardInserted = do
 \begin{frame}
   \frametitle{We Are Testing Types!}
 
+  \large
+
   \begin{itemize}
-    \item<1-> We have not tested the implementation
-    \item<2-> We have tested the dependent types which help guide us when
-              writing the implementation
-    \item<3-> Which gives us confidence that our types capture the right
-              behaviours
+    \item<1-> We have tested the dependent types which help guide us when
+              writing the implementation, not the implementation itself since it
+              is being kept in check by the types
+    \item<2-> Testing gives us confidence that we are not being misled
     \item<3-> Dependent types are type-level programs, let's test them!
   \end{itemize}
 
 \end{frame}
 
 
-%%% %% MARK: Benefits
-%%% \begin{frame}
-%%%   \frametitle{Benefits of a multifaceted approach}
-%%% 
-%%%   \begin{enumerate}
-%%%     \item<1-> Adaptability {\textemdash} being able to use different tools
-%%%     \item<2-> Speed {\textemdash} can trade speed for level of verification
-%%%     \begin{itemize}
-%%%       \item<2-> This isn't about proving things, it is about increasing
-%%%                 confidence in our typed models
-%%%       \item<3-> We could start adding proofs once the tests pass
-%%%     \end{itemize}
-%%%     \item<4-> \textbf{Coherence} {\textemdash} all done in one system
-%%%       \begin{itemize}
-%%%         \item<5-> Specification lives alongside model lives alongside
-%%%                   implementation
-%%%         \item<6-> The implementation is just there; it \emph{is} runnable code
-%%%         \item<7-> Parts can be verified independently \emph{while} combined into an
-%%%                   overall system
-%%%       \end{itemize}
-%%%   \end{enumerate}
-%%% 
-%%% \end{frame}
-
-
-%%% \begin{frame}
-%%% 
-%%%   \begin{center}
-%%%     \textcolor<1>{staDarkGreen}{\Large Thank you}
-%%%   \end{center}
-%%% 
-%%% \end{frame}
-
-
+%% MARK: End slide
 \begin{frame}
-  \frametitle{Links}
+  \frametitle{Thank You}
 
   \begin{center}
     {\large Email: {\href{mailto:teh6@st-andrews.ac.uk}{teh6@st-andrews.ac.uk}}}
+
+    \begin{figure}
+      \caption{\large Paper}
+      \vspace*{-3mm}
+      \includegraphics[width=0.4\framewidth]{acm-qr.png}
+    \end{figure}
+    \vspace*{-5mm}
+    \href{https://doi.org/10.1145/3678000.3678206}{doi:10.1145/3678000.3678206}
+    \vspace*{-6mm}
   \end{center}
-
-  \vspace*{-4mm}
-
-  \begin{columns}
-  \begin{column}{0.3\framewidth}
-    \begin{center}
-      Preprint
-      \begin{figure}
-        \includegraphics[width=\textwidth]{arxiv-qr.png}
-      \end{figure}
-      \href{https://doi.org/10.48550/arXiv.2407.12726}{arXiv:2407.12726}\vspace*{12mm}
-    \end{center}
-  \end{column}
-  \begin{column}{0.3\framewidth}
-    \begin{center}
-      Code
-      \begin{figure}
-        \includegraphics[width=\textwidth]{code-qr.png}
-      \end{figure}
-      \href{https://github.com/CodingCellist/tyde-24-code}{GitHub: CodingCellist/tyde-24-code}
-    \end{center}
-  \end{column}
-  \begin{column}{0.3\framewidth}
-    \begin{center}
-      Slides
-      \begin{figure}
-        \includegraphics[width=\textwidth]{slides-qr.png}
-      \href{https://github.com/CodingCellist/tyde-24-code}{GitHub: CodingCellist/talks/2024-09-06-tyde-24-milan}\vspace*{3mm}
-      \end{figure}
-    \end{center}
-  \end{column}
-  \end{columns}
-
 \end{frame}
 
 
@@ -1064,15 +971,15 @@ options CardInserted = do
 \begin{frame}
   \frametitle{Further work}
 
+  \large
+
   \begin{itemize}
-    \item<1-> Running tests at the type level puts a lot of strain on the
-              compiler, so there may be interesting optimisations to explore
-              there
-    \item<2-> Can we do more? ARQ with Sliding Window? Protocols with crash-stop
-              failures?
-    \item<3-> What kinds of properties can we test? There are parallels to Model
-              Checking, so how does this compare to LTL or
-              TLA\textsuperscript{+}?
+    \item Running tests at the type level puts a lot of strain on the
+          compiler, so there may be interesting optimisations to explore there
+    \item Can we do more? ARQ with Sliding Window? Protocols with crash-stop
+          failures?
+    \item What kinds of properties can we test? There are parallels to Model
+          Checking, so how does this compare to LTL or TLA\textsuperscript{+}?
   \end{itemize}
 
 \end{frame}
