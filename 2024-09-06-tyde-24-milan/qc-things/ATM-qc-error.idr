@@ -2,5 +2,5 @@
 --        EventuallyReady_OK. When unifying:
     So True
 -- and:
-    So (QuickCheck PROP_eventuallyReady)
+    So (quickCheck PROP_eventuallyReady)
 -- Mismatch between: True and False.
