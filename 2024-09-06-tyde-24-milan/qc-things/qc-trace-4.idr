@@ -6,4 +6,5 @@ Starting @ Ready:
 , (<ATM 'CheckPIN 0 ~ Incorrect'>, CardInserted)
 , (<ATM 'CheckPIN 0 ~ Incorrect'>, CardInserted)
 , (<ATM 'CheckPIN 0 ~ Incorrect'>, CardInserted)
+<...>
 ]\n"""

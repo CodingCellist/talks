@@ -288,14 +288,15 @@
   \end{column}
   \end{columns}
 
-  \pause
-
   \vspace*{2mm}
+  \begin{onlyenv}<6->
   \begin{center}
     \large
     Fits somewhere in the middle
   \end{center}
   \vspace*{-12mm}
+  \end{onlyenv}
+
 \end{frame}
 
 
@@ -316,6 +317,7 @@
 \end{frame}
 
 
+%% Edwin: cut?
 %% MARK: ATM States
 \begin{frame}[fragile]
   \frametitle{Datatype for the ATM states}
@@ -341,6 +343,7 @@
 \end{frame}
 
 
+%% Edwin: cut?
 %% MARK: ATM Results
 \begin{frame}[fragile]
   \frametitle{Datatype for ATM operation results}
@@ -374,6 +377,7 @@
 \end{frame}
 
 
+%% MARK: ChkPINfn
 \begin{frame}[fragile]
   \frametitle{State Transition Function}
 
@@ -453,6 +457,7 @@ data ATM : |\colorbox{lime}{(t : Type)}| -> ATMState -> |\colorbox{lime}{(t -> A
 \end{frame}
 
 
+%% Edwin: cut?
 %% MARK: ISM Prog.g
 \begin{frame}[fragile]
   \frametitle{Why Is This Neat?}
@@ -731,6 +736,7 @@ loopProg = do
 \end{frame}
 
 
+%% Edwin: cut?
 %% MARK: Trace overview
 \begin{frame}[fragile]
   \frametitle{A Bit of Work}
@@ -771,7 +777,7 @@ loopProg = do
 %%% 
 %%% \end{frame}
 
-
+%% Edwin: cut?
 %% MARK: Options CI
 \begin{frame}[fragile]
   \frametitle{ATM: from CardInserted}
@@ -807,7 +813,7 @@ options CardInserted = do
               type checking process!\\
               \mintinline{Idris}|So (quickCheck <property>)|
     \item<3-> Idris2 is built on Quantitative Type Theory, which has erasure,
-              meaning the tests are removed from the compiled program
+              meaning the tests can be removed from the compiled program
   \end{itemize}
 
 \end{frame}
@@ -860,7 +866,7 @@ options CardInserted = do
   \large
 
   \begin{itemize}
-    \item<1-> Now that we know there's an error, we can fix things!
+    \item<1-> Now that we know there's an error, we can fix things!\pause
               \begin{minted}[gobble=16]{Idris}
                 ChkPINfn : (retries : Nat) -> PINok -> ATMState
                 ChkPINfn 0     Correct   = Session
@@ -869,7 +875,7 @@ options CardInserted = do
                 ChkPINfn (S k) Incorrect = CardInserted k
               \end{minted}
 
-    \item<2-> Carrying this through to the generators, our property passes: the
+    \item<3-> Carrying this through to the generators, our property passes: the
               file reloads successfully and the REPL reports
               \begin{minted}[gobble=16]{Idris}
                 > quickCheck PROP_eventuallyReady
@@ -892,14 +898,14 @@ options CardInserted = do
     \item<1-> With most verification tools, we have to translate between
               representations
     \begin{itemize}
-      \item<1-> Spec, model, and implementation are independent
+      \item<1-> {\normalsize Spec, model, and implementation are independent}
     \end{itemize}
     \item<2-> This results in the risk of translation mistakes
     \begin{itemize}
-      \item<3-> The verification tool might not support the same types as the
-                implementation language
-      \item<4-> Might think we're verifying the same thing, when in actual fact
-                the semantics have changed between representations
+      \item<3-> {\normalsize The verification tool might not support the same
+                types as the implementation language}
+      \item<4-> {\normalsize Might think we're verifying the same thing, when in
+                actual fact the semantics have changed between representations}
     \end{itemize}
   \end{itemize}
 
