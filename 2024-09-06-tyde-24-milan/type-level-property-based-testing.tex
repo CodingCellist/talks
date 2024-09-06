@@ -736,24 +736,24 @@ loopProg = do
 \end{frame}
 
 
-%% Edwin: cut?
-%% MARK: Trace overview
-\begin{frame}[fragile]
-  \frametitle{A Bit of Work}
-
-  \large
-
-  \begin{itemize}
-    \item<1-> Store the operation and its result instance {\textemdash} for
-              example whether \mintinline{Idris}|PINok| was successful\\
-              \mintinline{Idris}|(<resT> ** <stFn> ** MkOpRes <op> <res : resT> ...)|
-    \item<2-> Store an operation-result pair, and the state this moved
-              us to\\
-              \mintinline{Idris}|TraceStep (OpRes <stT> ...) <resSt : stT>|
-    \item<3-> A chain of these make up a \emph{trace}
-  \end{itemize}
-
-\end{frame}
+%%% %% Edwin: cut?
+%%% %% MARK: Trace overview
+%%% \begin{frame}[fragile]
+%%%   \frametitle{A Bit of Work}
+%%% 
+%%%   \large
+%%% 
+%%%   \begin{itemize}
+%%%     \item<1-> Store the operation and its result instance {\textemdash} for
+%%%               example whether \mintinline{Idris}|PINok| was successful\\
+%%%               \mintinline{Idris}|(<resT> ** <stFn> ** MkOpRes <op> <res : resT> ...)|
+%%%     \item<2-> Store an operation-result pair, and the state this moved
+%%%               us to\\
+%%%               \mintinline{Idris}|TraceStep (OpRes <stT> ...) <resSt : stT>|
+%%%     \item<3-> A chain of these make up a \emph{trace}
+%%%   \end{itemize}
+%%% 
+%%% \end{frame}
 
 
 %% THESE ARE NOTES
